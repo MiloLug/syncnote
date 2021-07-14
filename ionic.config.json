@@ -1,0 +1,8 @@
+{
+  "name": "Syncnote",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue",
+  "id": "47235d78"
+}

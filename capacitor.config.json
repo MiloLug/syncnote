@@ -1,0 +1,14 @@
+{
+  "appId": "io.ionic.starter",
+  "appName": "Syncnote",
+  "bundledWebRuntime": false,
+  "npmClient": "npm",
+  "webDir": "dist",
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 0
+    }
+  },
+  "cordova": {},
+  "linuxAndroidStudioPath": "/usr/bin/android-studio"
+}
