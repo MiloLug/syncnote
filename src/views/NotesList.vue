@@ -3,7 +3,7 @@
         <ion-content class="content" forceOverscroll="false" overflow-scroll="false" no-bounce>
             <div class="notes-list-wrapper">
                 <div class="notes-list">
-                    <note-card class="note-card" v-for='note in notes' :key='note' :note-data="note"></note-card>
+                    <note-card class="note-card" v-for='note in $store.state.notes.notesList' :key='note' :note-data="note"></note-card>
                 </div>
             </div>
         </ion-content>
@@ -17,9 +17,6 @@ import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import NoteCard from '../components/NoteCard';
 
-import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
-
-
 export default {
     name: 'Login',
     components: {
@@ -28,20 +25,6 @@ export default {
     },
     data() {
         return {
-            pricetagOutline,
-            callOutline,
-            keyOutline,
-            mailOutline,
-            folderOpenOutline,
-            karavka: "",
-            notes: [
-                {title: 'Test Note 1', color: '#e35858', iconName: 'pricetagOutline'},
-                {title: 'Test Note 2', iconName: 'add'},
-                {title: 'Test Note 3', color: '#589be3', iconName: 'alert'},
-                {title: 'Test Note 4', color: '#e35858', iconName: 'pricetagOutline'},
-                {title: 'Test Note 5', iconName: 'pricetagOutline'},
-                {title: 'Test Note 6', color: '#e3a058', iconName: 'airplaneOutline'},
-            ],
         };
     },
     methods: {

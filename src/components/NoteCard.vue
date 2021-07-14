@@ -30,7 +30,6 @@ export default {
         }
     },
     data: function(){
-        console.log(this.noteData.iconName, icons[this.noteData.iconName]);
         return {
             mainClasses: [
                 {'has-color': this.noteData.color},
