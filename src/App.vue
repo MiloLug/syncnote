@@ -102,6 +102,9 @@ export default {
             ]
         };
     },
+    mounted() {
+        this.$store.dispatch("notes/updateList");
+    },
     methods: {
         // openScanner: async function(){
         //   this.lol = (await BarcodeScanner.scan()).text;

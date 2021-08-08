@@ -3,7 +3,13 @@
         <ion-content class="content" forceOverscroll="false" overflow-scroll="false" no-bounce>
             <div class="notes-list-wrapper">
                 <div class="notes-list">
-                    <note-card class="note-card" v-for='note in $store.state.notes.notesList' :key='note' :note-data="note"></note-card>
+                    <note-card
+                        class="note-card"
+                        v-for="(note, id) in $store.state.notes.notesList"
+                        @click="onCardClick(id, note)"
+                        :key="note"
+                        :note-data="note"
+                    ></note-card>
                 </div>
             </div>
         </ion-content>
@@ -28,8 +34,8 @@ export default {
         };
     },
     methods: {
-        test() {
-            console.log(this.karavka);
+        onCardClick(id, note) {
+            console.log(33);
         },
         onSubmit(e) {
             e.preventDefault();

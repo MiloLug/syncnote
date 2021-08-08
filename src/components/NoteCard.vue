@@ -1,6 +1,6 @@
 <template>
     <button class="card" :style="cssVars" :class="mainClasses">
-        <div class="card__info">21-09-2021</div>
+        <div class="card__info">{{ new Date(noteData.timeStamp).toLocaleDateString() }}</div>
         <div class="card__title">
             <quartz-icon-block :icon="icon">{{ noteData.title }}</quartz-icon-block>
         </div>
@@ -16,8 +16,8 @@
 <script>
 import QuartzIconBlock from '../components/QuartzIconBlock';
 import * as icons from 'ionicons/icons';
-
-console.log(icons);
+import * as lol from '../localization';
+window.lol = lol;
 
 export default {
     name:"NoteCard",
@@ -29,7 +29,7 @@ export default {
             required: true
         }
     },
-    data: function(){
+    data() {
         return {
             mainClasses: [
                 {'has-color': this.noteData.color},
