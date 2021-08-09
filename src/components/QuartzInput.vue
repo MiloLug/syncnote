@@ -3,11 +3,12 @@
         <ion-icon v-if="icon" class="input-block__icon" :ios="icon" :md="icon"></ion-icon>
         <input
             class="input-block__input"
-            v-bind:placeholder="placeholder"
-            v-bind:type="fieldType"
-            v-bind:value="dataValue"
-            v-on:input="onInput($event)"
-            v-on:change="onChange($event)"
+            :class="inputClasses"
+            :placeholder="placeholder"
+            :type="fieldType"
+            :value="dataValue"
+            @input="onInput($event)"
+            @change="onChange($event)"
         >
     </div>
 </template>
@@ -21,6 +22,7 @@ const formatsPiping = {
     text(newVal, oldVal=""){
         return newVal != undefined ? newVal : oldVal;
     },
+
     decimal(newVal, oldVal="0") {
         if(newVal?.constructor === String){
             newVal = newVal.trim();
@@ -33,6 +35,7 @@ const formatsPiping = {
         }
         return oldVal;
     },
+
     integer(newVal, oldVal="0") {
         if(newVal?.constructor === String){
             newVal = newVal.trim();
@@ -44,6 +47,7 @@ const formatsPiping = {
         }
         return oldVal;
     },
+
     phone(newVal, oldVal="") {
         if(newVal?.constructor === String){
             newVal = newVal.trim();
@@ -54,11 +58,13 @@ const formatsPiping = {
         }
         return oldVal;
     },
+
     login(newVal, oldVal="") {
         return newVal?.constructor === String
             ? (/(\w|-|_|\$)*/gmi).exec(newVal.trim())?.[0] ?? oldVal
             : oldVal;
     },
+
     email(newVal, oldVal="") {
         if(newVal?.constructor === String){
             newVal = newVal.trim();
@@ -67,7 +73,6 @@ const formatsPiping = {
                 || "";
         }
         return oldVal;
-
     }
 };
 function pipeValue(format, ...args) {
@@ -119,7 +124,7 @@ export default {
             default: ()=>"left",
             required: false
         },
-        shadowPosition: {
+        shadow: {
             default: ()=>"center",
             required: false
         }
@@ -130,8 +135,10 @@ export default {
             fieldType: fieldTypeFormatting[this.format] || "text",
             mainClasses: [
                 {'has-icon': this.icon},
-                'shadow-' + this.shadowPosition,
                 'icon-' + this.iconPosition
+            ],
+            inputClasses: [
+                'quartz-shadow-' + this.shadow,
             ]
         };
     },
@@ -162,9 +169,9 @@ export default {
     .input-block__icon {
         position: absolute;
         margin: auto;
-        font-size: 27.2px;
-        top: calc(50% - 13.6px);
-        left: 12.5px;
+        font-size: 24.2px;
+        top: calc(50% - 12.1px);
+        left: 14px;
 	z-index: 1;
     }
 
@@ -178,7 +185,6 @@ export default {
         border-radius: 50px;
         padding: 20px;
         font-size: 16px; 
-        box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.04);
     }
     .input-block__input[type=number] { 
         -moz-appearance: textfield;
@@ -188,17 +194,9 @@ export default {
     .input-block__input[type=number]::-webkit-outer-spin-button { 
           -webkit-appearance: none; 
     }    
-    .shadow-none .input-block__input {
-        box-shadow: none;
-    }
-    .shadow-right .input-block__input {
-        box-shadow: 27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .shadow-left .input-block__input {
-        box-shadow: -27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
     .input-block__input:focus {
-        background: var(--quartz-color-layer-3);
+        background: var(--quartz-color-layer-25);
+	box-shadow: var(--quartz-neu-shadow-sm-2);
     }
 
     .has-icon:not(.icon-right) .input-block__input {
@@ -208,10 +206,8 @@ export default {
         padding-right: 50px;
     }
     .has-icon.icon-right .input-block__icon {
-        right: 12.5px;
+        right: 14px;
         left: unset;
     }
-    
-
 </style>
 

@@ -16,8 +16,6 @@
 <script>
 import QuartzIconBlock from '../components/QuartzIconBlock';
 import * as icons from 'ionicons/icons';
-import * as lol from '../localization';
-window.lol = lol;
 
 export default {
     name:"NoteCard",
@@ -27,12 +25,17 @@ export default {
     props: {
         noteData: {
             required: true
+        },
+        shadow: {
+            default: ()=>"neu",
+            required: false
         }
     },
     data() {
         return {
             mainClasses: [
-                {'has-color': this.noteData.color},
+                {'has-color': !!this.noteData.color},
+                'quartz-shadow-' + this.shadow
             ],
             cssVars: {
                 '--note-color': this.noteData.color || 'var(--default-note-color)'
@@ -47,7 +50,7 @@ export default {
 
 <style scoped>
     .card {
-        --default-note-color: var(--quartz-color-layer-3);
+        --default-note-color: var(--quartz-color-layer-25);
         
         display: inline-flex;
         flex-direction: column;
@@ -57,44 +60,23 @@ export default {
         align-items: stretch;
         outline: none;
         border: none;
-        background-color: var(--quartz-color-layer-3);
-        box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.04);
+        background-color: var(--quartz-color-layer-25);
     }
     .card.has-color {
-        background-image: linear-gradient(to left, var(--note-color) -100%, transparent 150%);
+        background-image: linear-gradient(to left, var(--note-color) -310%, transparent 150%);
         border-right: 10px solid var(--note-color);
     }
     .card:not(.has-color) {
         padding-right: 30px;
     }
-    .card.shadow-none {
-        box-shadow: none;
-    }
-    .card.shadow-right {
-        box-shadow: 27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .card.shadow-left {
-        box-shadow: -27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-
+    
     .card:active {
-        box-shadow: none;
-        background-color: var(--quartz-color-layer-4);
+        background-color: var(--quartz-color-layer-3);
     }
     .card:active.has-color {
-        background-image: linear-gradient(to left, var(--note-color) -120%, transparent 150%);
+        background-image: linear-gradient(to left, var(--note-color) -320%, transparent 150%);
         border-right: 10px solid var(--note-color);
     }
-    .card:active.shadow-none {
-        box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .card:active.shadow-right {
-        box-shadow: 10px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .card:active.shadow-left {
-        box-shadow: -10px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-
     
     .card__title {
         margin-bottom: 10px;
