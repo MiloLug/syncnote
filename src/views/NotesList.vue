@@ -77,7 +77,6 @@ export default {
             e.preventDefault();
             return false;
         },
-        
     }
 }
 </script>
