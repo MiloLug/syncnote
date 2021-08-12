@@ -1,0 +1,50 @@
+@use 'utils/expanders' as expanders;
+
+*, input, body, html {
+    filter: none;
+}
+
+@include expanders.expand-shadows((
+    ".quartz-shadow-right": 27px 0px 14px 0px rgba(0,0,0,0.04),
+    ".quartz-shadow-left": -27px 0px 14px 0px rgba(0,0,0,0.04),
+    ".quartz-shadow-center": 0px 0px 14px 0px rgba(0,0,0,0.04),
+    ".quartz-shadow-2-neu": var(--quartz-shadow-2-neu),
+    ".quartz-shadow-2-neu-soft": var(--quartz-shadow-2-neu-soft)
+), (
+    ".quartz-inner-shadow-2-neu-concave": var(--quartz-inner-shadow-2-neu-concave),
+    ".quartz-inner-shadow-2-neu-concave-soft": var(--quartz-inner-shadow-2-neu-concave-soft)
+));
+
+
+.quartz-active-true:active, .quartz-focus-true:focus{
+    &.quartz-shadow-right {
+        box-shadow: 10px 0px 14px 0px rgba(0,0,0,0.04);
+    }
+    &.quartz-shadow-left {
+        box-shadow: -10px 0px 14px 0px rgba(0,0,0,0.04);
+    }
+    &.quartz-shadow-center {
+        box-shadow: none;
+    }
+}
+
+.quartz-active-true:active {
+    @include expanders.expand-shadows((
+        ".quartz-shadow-2-neu": var(--quartz-shadow-2-neu-soft),
+        ".quartz-shadow-2-neu-soft": none
+    ), (
+        ".quartz-inner-shadow-2-neu-concave": var(--quartz-inner-shadow-2-neu-concave-soft),
+        ".quartz-inner-shadow-2-neu-concave-soft": none
+    ), $prefix: '&');
+}
+
+.quartz-focus-true:focus {
+    @include expanders.expand-shadows((
+        ".quartz-shadow-2-neu": var(--quartz-shadow-2-neu-soft),
+        ".quartz-shadow-2-neu-soft": var(--quartz-shadow-2-neu) 
+    ), (
+        ".quartz-inner-shadow-2-neu-concave": var(--quartz-inner-shadow-2-neu-concave-soft),
+        ".quartz-inner-shadow-2-neu-concave-soft": none
+    ), $prefix: '&');
+}
+

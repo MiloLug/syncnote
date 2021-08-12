@@ -16,6 +16,7 @@
 <script>
 import QuartzIconBlock from '../components/QuartzIconBlock';
 import * as icons from 'ionicons/icons';
+import styleProps, {applyClasses} from '../mixins/style-props.js';
 
 export default {
     name:"NoteCard",
@@ -23,19 +24,22 @@ export default {
         QuartzIconBlock
     },
     props: {
+        ...styleProps,
         noteData: {
             required: true
         },
         shadow: {
-            default: ()=>"neu",
-            required: false
+            default: ()=>"2-neu",
+        },
+        quartzActive: {
+            default: ()=>"true"
         }
     },
     data() {
         return {
             mainClasses: [
                 {'has-color': !!this.noteData.color},
-                'quartz-shadow-' + this.shadow
+                ...applyClasses(this)
             ],
             cssVars: {
                 '--note-color': this.noteData.color || 'var(--default-note-color)'
@@ -50,7 +54,7 @@ export default {
 
 <style scoped>
     .card {
-        --default-note-color: var(--quartz-color-layer-25);
+        --default-note-color: var(--quartz-color-25);
         
         display: inline-flex;
         flex-direction: column;
@@ -60,7 +64,7 @@ export default {
         align-items: stretch;
         outline: none;
         border: none;
-        background-color: var(--quartz-color-layer-25);
+        background-color: var(--quartz-color-25);
     }
     .card.has-color {
         background-image: linear-gradient(to left, var(--note-color) -310%, transparent 150%);
@@ -71,7 +75,7 @@ export default {
     }
     
     .card:active {
-        background-color: var(--quartz-color-layer-3);
+        background-color: var(--quartz-color-3);
     }
     .card:active.has-color {
         background-image: linear-gradient(to left, var(--note-color) -320%, transparent 150%);
@@ -88,7 +92,7 @@ export default {
     }
     .card__divider {
         width: 100%;
-        background: linear-gradient(to right, var(--quartz-color-contrast-1) -30%, transparent 100%);
+        background: linear-gradient(to right, var(--quartz-color-1-contrast) -30%, transparent 100%);
         padding: 0;
         margin-left: 0;
         margin-bottom: 13px;

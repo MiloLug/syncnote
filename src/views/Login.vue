@@ -77,7 +77,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .data-form {
         display: flex;
         flex-direction: column;
@@ -89,8 +89,10 @@ export default {
     .input-line {
         margin: 8px 0px;
         width: calc(100% - 40px);
+        
+        &.controls {
+            text-align: right;
+        }
     }
-    .input-line.controls {
-        text-align: right;
-    }
+    
 </style>

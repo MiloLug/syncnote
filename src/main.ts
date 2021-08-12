@@ -14,17 +14,22 @@ import '@ionic/vue/css/typography.css';
 
 
 /* Theme variables */
-import './theme/variables.css';
+import './styles/variables.scss';
 
 /* Quartz theming tools */
-import './theme/quartz.css';
+import './styles/quartz.scss';
+
+/* Quartz libs */
+import quartzIonicEvents from '@quartz-vision/ionic-events';
 
 import store from './store/index.js';
+
 
 const app = createApp(App)
   .use(store)
   .use(IonicVue)
-  .use(router);
+  .use(router)
+  .use(quartzIonicEvents);
 
 router.isReady().then(() => {
   app.mount('#app');

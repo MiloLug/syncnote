@@ -4,6 +4,7 @@
             <div class="notes-list-wrapper">
                 <div class="notes-list">
                     <note-card
+                        v-quartz:long-tap="onLongTap"
                         class="note-card"
                         v-for="(note, id) in $store.state.notes.notesList"
                         @click="onCardClick(id, note)"
@@ -17,9 +18,8 @@
 </template>
 
 <script lang="js">
-import { createGesture, IonPage } from '@ionic/vue';
+import { IonPage } from '@ionic/vue';
 
-import QuartzButton from '../components/QuartzButton';
 import NoteCard from '../components/NoteCard';
 
 export default {
@@ -35,48 +35,17 @@ export default {
         };
     },
 
-    mounted() {
-        /*let timeout;
-
-        const clearGestureTimeout = () => {
-            if (timeout) {
-                clearTimeout(timeout);
-                timeout = undefined;
-            }
-        };
-
-        const gesture = createGesture({
-            el: this.$el,
-            threshold: 0,
-            onStart: () => {
-                clearGestureTimeout();					
-                timeout = setTimeout(() => {
-                    timeout = undefined;
-                    console.log(23);
-                }, 1000);
-            },
-            onMove: (detail) => {
-                if (detail.deltaX <= 10 && detail.deltaY <= 10) {
-                    return;
-                }
-                clearGestureTimeout();
-            },
-            onEnd: () => {
-                clearGestureTimeout();
-            },
-        });
-
-        gesture.enable(); */
-    },
-
     methods: {
-        onCardClick(id, note) {
+        onCardClick() {
             console.log(33);
         },
         onSubmit(e) {
             e.preventDefault();
             return false;
         },
+        onLongTap() {
+            console.log(321213);
+        }
     }
 }
 </script>

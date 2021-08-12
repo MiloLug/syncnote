@@ -7,6 +7,7 @@
             :placeholder="placeholder"
             :type="fieldType"
             :value="dataValue"
+            :style="cssVars"
             @input="onInput($event)"
             @change="onChange($event)"
         >
@@ -17,6 +18,8 @@
 /*eslint no-control-regex: 0*/
 
 import { IonIcon } from '@ionic/vue';
+import styleProps, {applyClasses, applyCss} from '../mixins/style-props.js';
+
 
 const formatsPiping = {
     text(newVal, oldVal=""){
@@ -124,9 +127,21 @@ export default {
             default: ()=>"left",
             required: false
         },
+        ...styleProps,
         shadow: {
-            default: ()=>"center",
-            required: false
+            default: ()=>"2-neu-soft"
+        },
+        innerShadow: {
+            default: ()=>"2-neu-concave-soft"
+        },
+        borderColor: {
+            default: ()=>"var(--quartz-color-0)" 
+        },
+        borderWidth: {
+            default: ()=>"2px"
+        },
+        quartzFocus: {
+            default: ()=>"true"
         }
     },
     data: function(){
@@ -138,7 +153,10 @@ export default {
                 'icon-' + this.iconPosition
             ],
             inputClasses: [
-                'quartz-shadow-' + this.shadow,
+                ...applyClasses(this)
+            ],
+            cssVars: [
+                ...applyCss(this)
             ]
         };
     },
@@ -186,6 +204,9 @@ export default {
         padding: 20px;
         font-size: 16px; 
     }
+    .input-block__input.has-borderColor.has-borderWidth {
+        border-style: solid;
+    }
     .input-block__input[type=number] { 
         -moz-appearance: textfield;
         appearance: textfield;
@@ -196,7 +217,6 @@ export default {
     }    
     .input-block__input:focus {
         background: var(--quartz-color-layer-25);
-	box-shadow: var(--quartz-neu-shadow-sm-2);
     }
 
     .has-icon:not(.icon-right) .input-block__input {

@@ -1,0 +1,40 @@
+@use 'sass:color';
+
+@mixin expand-vars($prefix: "", $vars: (), $postfix: "") {
+    @each $key, $value in $vars {
+        #{$prefix}#{$key}#{$postfix}: $value
+    }
+}
+
+@mixin expand-color-vars($prefix: "", $vars: (), $postfix: "") {
+    @each $key, $value in $vars {
+        #{$prefix}#{$key}#{$postfix}: $value;
+        #{$prefix}#{$key}#{$postfix}-rgb: hexToRGB($value);
+        #{$prefix}#{$key}#{$postfix}-contrast: color.invert($value);
+        #{$prefix}#{$key}#{$postfix}-contrast-rgb: hexToRGB(color.invert($value));
+    }
+}
+
+
+@mixin expand-shadows($outset, $inset, $prefix: '') {
+    @each $selector, $shadow in $inset {
+        #{$prefix}#{$selector} {
+            box-shadow: $shadow;
+        }
+    }
+    @each $selector, $shadow in $outset {
+        #{$prefix}#{$selector} {
+            box-shadow: $shadow;
+        }
+    }
+    @each $in-selector, $in-shadow in $inset {
+        @each $out-selector, $out-shadow in $outset {
+            @if $in-shadow != none and $out-shadow != none {
+                #{$prefix}#{$in-selector}#{$out-selector} {
+                    box-shadow: $in-shadow, $out-shadow;
+                }
+            }
+        }
+    }
+}
+

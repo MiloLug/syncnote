@@ -23,7 +23,7 @@
             <div class="quartz-bar__sub-nav-scroll">
                 <div class="quartz-bar__sub-nav">
                     <button
-                        class="quartz-bar__sub-nav__item"
+                        class="quartz-bar__sub-nav__item quartz-shadow-right"
                         v-for="item in currentEntry.items"
                         @click="entryOnClick(item)"
                         v-bind:key="item"
@@ -173,7 +173,6 @@ export default {
         font-size: 16px;
         background: transparent;
         cursor: pointer;
-        box-shadow: 27px 0px 14px 0px rgba(0,0,0,0.03);
     }
 
 
