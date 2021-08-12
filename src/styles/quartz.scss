@@ -2,6 +2,7 @@
 
 *, input, body, html {
     filter: none;
+    color: var(--quartz-text-color);
 }
 
 @include expanders.expand-shadows((

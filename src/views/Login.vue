@@ -34,7 +34,7 @@
                     placeholder="email"
                 />
                 <div class="input-line controls">
-                    <quartz-button type="submit" class="submit-button">
+                    <quartz-button type="submit" class="submit-button" shadow="center">
                         Sign up
                     </quartz-button>
                 </div>
@@ -87,11 +87,16 @@ export default {
 
 
     .input-line {
-        margin: 8px 0px;
+        margin: 14px 0px;
         width: calc(100% - 40px);
         
         &.controls {
             text-align: right;
+            margin-top: 40px;
+
+            .submit-button {
+                width: 100%;
+            }
         }
     }
     

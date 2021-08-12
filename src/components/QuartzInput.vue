@@ -1,8 +1,8 @@
 <template>
     <div class="input-block" v-bind:class="mainClasses">
-        <ion-icon v-if="icon" class="input-block__icon" :ios="icon" :md="icon"></ion-icon>
+        <ion-icon v-if="icon" class="icon" :ios="icon" :md="icon"></ion-icon>
         <input
-            class="input-block__input"
+            class="input"
             :class="inputClasses"
             :placeholder="placeholder"
             :type="fieldType"
@@ -177,57 +177,66 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .input-block {
         display: block;
         position: relative;
-    }
     
+        .icon {
+            position: absolute;
+            margin: auto;
+            font-size: 24.2px;
+            top: calc(50% - 12.1px);
+            left: 14px;
+            z-index: 1;
+            --ionicon-stroke-width: 27;
+        }
 
-    .input-block__icon {
-        position: absolute;
-        margin: auto;
-        font-size: 24.2px;
-        top: calc(50% - 12.1px);
-        left: 14px;
-	z-index: 1;
-    }
+        
+        .input {
+            width: 100%;
+            outline: none;
+            border: none;
+            background: transparent;
+            height: 50px;
+            border-radius: 50px;
+            padding: 20px;
+            font-size: 16px;
 
-
-    .input-block__input {
-        width: 100%;
-        outline: none;
-        border: none;
-        background: transparent;
-        height: 50px;
-        border-radius: 50px;
-        padding: 20px;
-        font-size: 16px; 
-    }
-    .input-block__input.has-borderColor.has-borderWidth {
-        border-style: solid;
-    }
-    .input-block__input[type=number] { 
-        -moz-appearance: textfield;
-        appearance: textfield;
-    }
-    .input-block__input[type=number]::-webkit-inner-spin-button, 
-    .input-block__input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-    }    
-    .input-block__input:focus {
-        background: var(--quartz-color-layer-25);
-    }
-
-    .has-icon:not(.icon-right) .input-block__input {
-        padding-left: 50px;
-    }
-    .has-icon.icon-right .input-block__input {
-        padding-right: 50px;
-    }
-    .has-icon.icon-right .input-block__icon {
-        right: 14px;
-        left: unset;
+            &.has-borderColor.has-borderWidth {
+                border-style: solid;
+            }
+            
+            &[type=number] { 
+                -moz-appearance: textfield;
+                appearance: textfield;
+            }
+            &[type=number]::-webkit-inner-spin-button, 
+            &[type=number]::-webkit-outer-spin-button { 
+                -webkit-appearance: none; 
+            }    
+            
+            &:focus {
+                background: var(--quartz-color-layer-25);
+            }
+        }
+    
+        &.has-icon:not(.icon-right) {
+            .input {
+                padding-left: 50px;
+            }
+        }
+        
+        &.has-icon.icon-right {
+            .input {
+                padding-right: 50px;
+            }
+            
+            .icon {
+                right: 14px;
+                left: unset;
+            }
+        }
     }
 </style>
 

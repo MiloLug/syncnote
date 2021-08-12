@@ -75,7 +75,7 @@ export default {
     }
     
     .card:active {
-        background-color: var(--quartz-color-3);
+        background-color: var(--quartz-color-4);
     }
     .card:active.has-color {
         background-image: linear-gradient(to left, var(--note-color) -320%, transparent 150%);

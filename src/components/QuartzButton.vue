@@ -1,10 +1,16 @@
 <template>
-    <button v-bind:type="type" class="button" v-bind:class="mainClasses">
+    <button
+        :type="type"
+        class="button"
+        :class="mainClasses"
+        :style="cssVars"
+    >
         <slot></slot>
     </button>
 </template>
 
 <script>
+import styleProps, {applyClasses, applyCss} from '../mixins/style-props.js';
 
 export default {
     name:"QuartzButton",
@@ -19,11 +25,22 @@ export default {
             default: ()=>"button",
             required: false
         },
+        ...styleProps,
+        quartzActive: {
+            default: ()=>"true"
+        },
+        contrast: {
+            default: ()=>"true"
+        }
     },
     data: function(){
         return {
             mainClasses: [
-                'shadow-' + this.shadowPosition,
+                'contrast-' + this.contrast,
+                ...applyClasses(this)
+            ],
+            cssVars: [
+                ...applyCss(this)
             ]
         };
     },
@@ -32,39 +49,28 @@ export default {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
     .button {
         outline: none;
         border: none;
-        background: var(--quartz-color-layer-3);
+        background: var(--quartz-color-3);
         height: 50px;
         border-radius: 50px;
         padding: 0px 20.5px;
         font-size: 16px;
-        box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .button.shadow-none {
-        box-shadow: none;
-    }
-    .button.shadow-right {
-        box-shadow: 27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .button.shadow-left {
-        box-shadow: -27px 0px 14px 0px rgba(0,0,0,0.04);
-    }
 
-    .button:active {
-        box-shadow: none;
-        background: var(--quartz-color-layer-4);
-    }
-    .button:active.shadow-none {
-        box-shadow: 0px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .button:active.shadow-right {
-        box-shadow: 10px 0px 14px 0px rgba(0,0,0,0.04);
-    }
-    .button:active.shadow-left {
-        box-shadow: -10px 0px 14px 0px rgba(0,0,0,0.04);
+        &:active {
+            background: var(--quartz-color-4);
+        }
+
+        &.contrast-true {
+            background: var(--quartz-color-1-contrast);            
+            color: var(--quartz-color-4);
+
+            &:active {
+                background: var(--quartz-color-4-contrast);
+            }
+        }
     }
 </style>
 
