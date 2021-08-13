@@ -1,4 +1,5 @@
 @use 'sass:color';
+@use 'tools' as tools;
 
 @mixin expand-vars($prefix: "", $vars: (), $postfix: "") {
     @each $key, $value in $vars {
@@ -9,9 +10,9 @@
 @mixin expand-color-vars($prefix: "", $vars: (), $postfix: "") {
     @each $key, $value in $vars {
         #{$prefix}#{$key}#{$postfix}: $value;
-        #{$prefix}#{$key}#{$postfix}-rgb: hexToRGB($value);
+        #{$prefix}#{$key}#{$postfix}-rgb: tools.hexToRGB($value);
         #{$prefix}#{$key}#{$postfix}-contrast: color.invert($value);
-        #{$prefix}#{$key}#{$postfix}-contrast-rgb: hexToRGB(color.invert($value));
+        #{$prefix}#{$key}#{$postfix}-contrast-rgb: tools.hexToRGB(color.invert($value));
     }
 }
 

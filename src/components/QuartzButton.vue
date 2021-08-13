@@ -29,14 +29,10 @@ export default {
         quartzActive: {
             default: ()=>"true"
         },
-        contrast: {
-            default: ()=>"true"
-        }
     },
     data: function(){
         return {
             mainClasses: [
-                'contrast-' + this.contrast,
                 ...applyClasses(this)
             ],
             cssVars: [
@@ -53,23 +49,15 @@ export default {
     .button {
         outline: none;
         border: none;
-        background: var(--quartz-color-3);
+        background: var(--quartz-color-primary);
+        color: var(--quartz-text-color-primary);
         height: 50px;
         border-radius: 50px;
         padding: 0px 20.5px;
         font-size: 16px;
 
         &:active {
-            background: var(--quartz-color-4);
-        }
-
-        &.contrast-true {
-            background: var(--quartz-color-1-contrast);            
-            color: var(--quartz-color-4);
-
-            &:active {
-                background: var(--quartz-color-4-contrast);
-            }
+            background: var(--quartz-color-primary-active);
         }
     }
 </style>

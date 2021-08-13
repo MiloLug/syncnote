@@ -6,9 +6,9 @@
 }
 
 @include expanders.expand-shadows((
-    ".quartz-shadow-right": 27px 0px 14px 0px rgba(0,0,0,0.04),
-    ".quartz-shadow-left": -27px 0px 14px 0px rgba(0,0,0,0.04),
-    ".quartz-shadow-center": 0px 0px 14px 0px rgba(0,0,0,0.04),
+    ".quartz-shadow-right": var(--quartz-shadow-right),
+    ".quartz-shadow-left": var(--quartz-shadow-left),
+    ".quartz-shadow-center": var(--quartz-shadow-center),
     ".quartz-shadow-2-neu": var(--quartz-shadow-2-neu),
     ".quartz-shadow-2-neu-soft": var(--quartz-shadow-2-neu-soft)
 ), (
