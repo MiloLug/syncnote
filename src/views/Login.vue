@@ -1,6 +1,6 @@
 <template>
     <ion-page>
-        <ion-content class="content" forceOverscroll="false" overflow-scroll="false" no-bounce>
+        <ion-content class="content">
             <form class="data-form" @submit="onSubmit">
                 <quartz-input
                     format="login"

@@ -178,6 +178,8 @@ export default {
 </script>
 
 <style scoped lang="scss">
+    @use "@/styles/utils/tools";
+
     .input-block {
         display: block;
         position: relative;
@@ -189,11 +191,15 @@ export default {
             top: calc(50% - 12.1px);
             left: 14px;
             z-index: 1;
-            --ionicon-stroke-width: 27;
+            --ionicon-stroke-width: 20;
         }
 
         
         .input {
+            @include tools.placeholder {
+                color: var(--quartz-color-25-contrast);
+            }
+
             width: 100%;
             outline: none;
             border: none;
@@ -217,7 +223,7 @@ export default {
             }    
             
             &:focus {
-                background: var(--quartz-color-layer-25);
+                background: var(--quartz-color-25);
             }
         }
     
