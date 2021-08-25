@@ -30,7 +30,7 @@
   </IonApp> -->
     <IonApp>
         <ion-router-outlet id="main-content"></ion-router-outlet>
-        <quartz-bar v-bind:content="quartzBarContent"></quartz-bar>
+        <quartz-bar id="main-bar" v-bind:content="quartzBarContent"></quartz-bar>
     </IonApp>
 </template>
 
@@ -61,7 +61,7 @@ export default {
                     items: [
                         {
                             name: "Log in",
-                            action: () => this.$router.push("login")
+                            action: () => this.$router.push({name: "login"})
                         }
                     ]
                 },
@@ -70,8 +70,8 @@ export default {
                     name: "Safety",
                     items: [
                         {
-                            name:"item",
-                            action: () => this.$router.push("test")
+                            name:"test editor",
+                            action: () => this.$router.push({name: "note-create"})
                         },
                         {
                             name:"item2",
@@ -104,11 +104,23 @@ export default {
     },
     mounted() {
         this.$store.dispatch("notes/updateList");
+        window.addEventListener('keyboardDidShow', this.onKeyboardDidShow);
+        window.addEventListener('keyboardDidHide', this.onKeyboardDidHide);
     },
     methods: {
         // openScanner: async function(){
         //   this.lol = (await BarcodeScanner.scan()).text;
         // }
+        onKeyboardDidShow() {
+            this.$nextTick(()=>document.querySelector('body').classList.add('hide-main-bar'));
+        },
+        onKeyboardDidHide() {
+            document.querySelector('body').classList.remove('hide-main-bar');
+        }
+    },
+    unmounted() {
+        window.removeEventListener('keyboardDidShow', this.onKeyboardDidShow);
+        window.removeEventListener('keyboardDidHide', this.onKeyboardDidHide);
     }
 }
 // import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
@@ -205,8 +217,20 @@ export default {
 // });
 </script>
 
-<style scoped>
+<style lang="scss">
     #main-content {
         height: calc(100% - 50px);
+    }
+    #main-bar {
+        display: initial;
+    }
+    
+    .hide-main-bar {
+        #main-bar {
+            display: none;
+        }
+        #main-content {
+            height: 100%;
+        }
     }
 </style>

@@ -18,6 +18,9 @@ import './styles/variables.scss';
 
 /* Quartz theming tools */
 import './styles/quartz.scss';
+// our medium editor theme
+import './styles/quartz-medium-editor.scss';
+
 
 /* Quartz libs */
 import quartzIonicEvents from '@quartz-vision/ionic-events';

@@ -12,6 +12,7 @@ http://ionicframework.com/docs/theming/ */
     @include expanders.expand-color-vars(--quartz-color-, (
         "0": #ffffff07,
         "1": #d7d8da,
+        "15": #e7e7e7,
         "2": #f3f3f3,
         "25": #f6f6f7,
         "3": #f9f9f9,
@@ -41,6 +42,14 @@ http://ionicframework.com/docs/theming/ */
     --quartz-inner-shadow-2-neu-concave: inset -3px -3px 5px 0px #fff, inset 2px 2px 5px 0px #0000001a;
     --quartz-inner-shadow-2-neu-concave-soft: inset -3px -3px 10px -1px #fff, inset 2px 2px 10px -1px #00000014;
 
+    --quartz-shadow-2-neu-contrast: -3px -2px 5px 0px #ffffff0a, 3px 3px 5px 0px #0000004a;
+    --quartz-shadow-2-neu-soft-contrast: -3px -3px 10px 0px #ffffff05, 2px 2px 10px -1px #0000001a;
+    
+    --quartz-inner-shadow-2-neu-concave-contrast: inset -3px -3px 5px 0px #ffffff0a, inset 2px 2px 5px 0px #0000004a;
+    --quartz-inner-shadow-2-neu-concave-soft-contrast: inset -3px -3px 10px 0px #ffffff0a, inset 2px 2px 10px -1px #00000029;
+
+
+
     --quartz-shadow-right: 27px 0px 14px 0px rgba(0,0,0,0.04);
     --quartz-shadow-left: -27px 0px 14px 0px rgba(0,0,0,0.04);
     --quartz-shadow-center: 0px 0px 14px 0px rgba(0,0,0,0.04);
@@ -51,6 +60,7 @@ http://ionicframework.com/docs/theming/ */
     @include expanders.expand-color-vars(--quartz-color-, (
         "0": #48414107,
         "1": #282725,
+        "15": #1f1f1f,
         "2": #17262c,
         "25": #1c2b32,
         "3": #111c21,
@@ -70,6 +80,13 @@ http://ionicframework.com/docs/theming/ */
     
     --quartz-inner-shadow-2-neu-concave: inset -3px -3px 5px 0px #ffffff0a, inset 2px 2px 5px 0px #0000004a;
     --quartz-inner-shadow-2-neu-concave-soft: inset -3px -3px 10px 0px #ffffff0a, inset 2px 2px 10px -1px #00000029;
+
+    --quartz-shadow-2-neu-contrast: -3px -3px 5px 0px #ffffff08, 2px 2px 5px 0px #00000030;
+    --quartz-shadow-2-neu-soft-contrast: -3px -3px 10px 0px #fff, 2px 2px 10px -1px #0000001a;
+    
+    --quartz-inner-shadow-2-neu-concave-contrast: inset -3px -3px 5px 0px #fff, inset 2px 2px 5px 0px #0000001a;
+    --quartz-inner-shadow-2-neu-concave-soft-contrast: inset -3px -3px 10px -1px #fff, inset 2px 2px 10px -1px #00000014;
+
 
     --quartz-shadow-right: 27px 0px 14px 0px rgba(0,0,0,0.2);
     --quartz-shadow-left: -27px 0px 14px 0px rgba(0,0,0,0.2);

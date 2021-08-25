@@ -1,34 +1,33 @@
 <template>
     <ion-page>
         <ion-content class="content">
-            <div class="notes-list-wrapper">
-                <div class="notes-list">
-                    <note-card
-                        v-quartz:long-tap="onLongTap"
-                        class="note-card"
-                        v-for="(note, id) in $store.state.notes.notesList"
-                        @click="onCardClick(id, note)"
-                        :key="note"
-                        :note-data="note"
-                    ></note-card>
-                </div>
-            </div>
+            <note-view
+                :note-data="note"
+                v-if="note"
+            />
         </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
 import { IonPage } from '@ionic/vue';
-
-import NoteCard from '../components/NoteCard';
+import NoteView from '../components/NoteView.vue';
 
 export default {
-    name: 'Login',
+    name: 'Note',
 
     components: {
         IonPage,
-        NoteCard
+        NoteView,
     },
+
+    computed: {
+        note() {
+            return this.$store.state.notes.notesList[
+                this.$route.params.id
+            ];
+        }
+    },    
 
     data() {
         return {
@@ -36,21 +35,13 @@ export default {
     },
 
     methods: {
-        onCardClick(id, note) {
-            this.$router.push({name: "note", params: {id}});
-        },
-        onSubmit(e) {
-            e.preventDefault();
-            return false;
-        },
-        onLongTap() {
-            console.log(321213);
-        }
     }
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+    
+
     .notes-list-wrapper {
         text-align: center;
     }

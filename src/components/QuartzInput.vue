@@ -178,7 +178,7 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    @use "@/styles/utils/tools";
+    @use "@/styles/utils/tools.scss";
 
     .input-block {
         display: block;
