@@ -28,9 +28,9 @@ const routes: Array<RouteRecordRaw> = [
         name: 'notes-list'
     },
     {
-        path: '/login',
-        component: () => import('../views/Login.vue'),
-        name: 'login'
+        path: '/sign-up',
+        component: () => import('../views/SignUp.vue'),
+        name: 'sign-up'
     }
 ]
 

@@ -39,6 +39,7 @@ import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import QuartzBar from './components/QuartzBar';
 // import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { lockOpenOutline, homeOutline, syncOutline, gridOutline} from 'ionicons/icons';
+import { tr } from './localization';
 
 export default {
     name: "App",
@@ -52,22 +53,26 @@ export default {
             quartzBarContent: [
                 {
                     icon: homeOutline,
-                    name: "Home",
+                    name: tr`Home`,
                     action: () => this.$router.push("/")
                 },
                 {
                     icon: syncOutline,
-                    name: "Syncronization",
+                    name: tr`Syncronization`,
                     items: [
                         {
-                            name: "Log in",
-                            action: () => this.$router.push({name: "login"})
+                            name: tr`Sign Up`,
+                            action: () => this.$router.push({name: "sign-up"})
+                        },
+                        {
+                            name: tr`Sign In`,
+                            action: () => this.$router.push({name: "sign-in"})
                         }
                     ]
                 },
                 {
                     icon: lockOpenOutline,
-                    name: "Safety",
+                    name: tr`Safety`,
                     items: [
                         {
                             name:"test editor",
@@ -92,7 +97,7 @@ export default {
                 },
                 {
                     icon: gridOutline,
-                    name: "Other",
+                    name: tr`Other`,
                     items: [
                         {
                             name:"item"

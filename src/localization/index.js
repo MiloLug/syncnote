@@ -19,7 +19,7 @@ const primaryDictionary = baseGroup
     ? baseGroup[currentLang.country] ?? baseGroup['*']
     : dictionaries['*'];
 
-function _(key) {
+function tr(key) {
     return primaryDictionary[key] ?? key;
 }
 
@@ -27,5 +27,6 @@ export {
     dictionaries,
     currentLang,
     primaryDictionary,
-    _
+    tr,
 };
+

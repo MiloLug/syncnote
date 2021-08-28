@@ -6,36 +6,25 @@
                     format="login"
                     :icon="folderOpenOutline"
                     class="input-line"
-                    placeholder="имя"
+                    :placeholder="tr`Login *`"
                     v-model="karavka"
-                />
-                <quartz-input
-                    format="decimal"
-                    :icon="pricetagOutline"
-                    class="input-line"
-                    placeholder="пачём грибы (грн)"
-                />
-                <quartz-input
-                    format="phone"
-                    :icon="callOutline"
-                    class="input-line"
-                    placeholder="телефончек"
-                />
-                <quartz-input
-                    format="password"
-                    :icon="keyOutline"
-                    class="input-line"
-                    placeholder="пароль"
                 />
                 <quartz-input
                     format="email"
                     :icon="mailOutline"
                     class="input-line"
-                    placeholder="email"
+                    :placeholder="tr`Email`"
                 />
+                <quartz-input
+                    format="password"
+                    :icon="keyOutline"
+                    class="input-line"
+                    :placeholder="tr`Password *`"
+                />
+                
                 <div class="input-line controls">
                     <quartz-button type="submit" class="submit-button" shadow="center">
-                        Sign up
+                        {{tr`Sign Up`}}
                     </quartz-button>
                 </div>
             </form>
@@ -48,8 +37,10 @@ import { IonPage } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
+import { tr } from '../localization';
+
 export default {
-    name: 'Login',
+    name: 'SignUp',
     components: {
         IonPage,
         QuartzInput,
@@ -62,7 +53,8 @@ export default {
             keyOutline,
             mailOutline,
             folderOpenOutline,
-            karavka: ""
+            karavka: "",
+            tr
         };
     },
     methods: {
