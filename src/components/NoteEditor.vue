@@ -1,6 +1,6 @@
 <template>
     <div class="editor">
-        <div v-if="editor" class="control-panel" @mousedown="onDown">
+        <div v-if="editor" class="control-panel" @mousedown="preventDown">
             <button
                 class="control undo"
                 @click="editor.chain().focus().undo().run()"
@@ -103,7 +103,11 @@
             </button> 
     </div>
     <div class="editor-content-wrapper">
-        <editor-content data-placeholder="Input something" class="editor-content" :editor="editor" />
+        <editor-content
+            :data-placeholder="tr`Start writing`"
+            class="editor-content"
+            :editor="editor"
+        />
     </div>
   </div>
 </template>
@@ -115,13 +119,29 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Indent } from '../utils/tiptap-indent';
 import { IonIcon } from '@ionic/vue';
 import { listOutline, codeOutline, returnUpForwardOutline, returnUpBackOutline } from 'ionicons/icons';
-
+import { tr } from '../localization';
 
 export default {
-  components: {
-    EditorContent,
-    IonIcon
-  },
+    components: {
+        EditorContent,
+        IonIcon
+    },
+
+    props: {
+        modelValue: {
+            default: "",
+            type: String
+        }
+    },
+
+    watch: {
+        modelValue(value) {
+            if (this.editor.getHTML() === value)
+                return;
+
+            this.editor.commands.setContent(this.modelValue, false);
+        },
+    },
 
     data() {
         return {
@@ -129,58 +149,27 @@ export default {
             listOutline,
             codeOutline,
             returnUpForwardOutline,
-            returnUpBackOutline
+            returnUpBackOutline,
+            tr
         }
     },
 
-  mounted() {
-    this.editor = new Editor({
-      extensions: [
-        Indent,
-        StarterKit,
-        Placeholder,
-      ],
-      content: `
-        <h2>
-          Hi there,
-        </h2>
-        <p>
-          this is a <em>basic</em> example of <strong>tiptap</strong>. Sure, there are all kind of basic text styles you’d probably expect from a text editor. But wait until you see the lists:
-        </p>
-        <ul>
-          <li>
-            That’s a bullet list with one …
-          </li>
-          <li>
-            … or two list items.
-          </li>
-        </ul>
-        <p>
-          Isn’t that great? And all of that is editable. But wait, there’s more. Let’s try a code block:
-        </p>
-        <pre><code class="language-css">body {
-  display: none;
-}</code></pre>
-        <p>
-          I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-        </p><p>
-          I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-        </p><p>
-          I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-        </p><p>
-          I know, I know, this is impressive. It’s only the tip of the iceberg though. Give it a try and click a little bit around. Don’t forget to check the other examples too.
-        </p>
-        <blockquote>
-          Wow, that’s amazing. Good work, boy! 👏
-          <br />
-          — Mom
-        </blockquote>
-      `,
-    })
-  },
+    mounted() {
+        this.editor = new Editor({
+            extensions: [
+                Indent,
+                StarterKit,
+                Placeholder,
+            ],
+            content: this.modelValue,
+            onUpdate: () => {
+                this.$emit('update:modelValue', this.editor.getHTML())
+            },
+        });
+    },
 
     methods: {
-        onDown(e) {
+        preventDown(e) {
             e.preventDefault();
         }
     },

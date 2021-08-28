@@ -1,7 +1,7 @@
 <template>
     <ion-page>
         <ion-content class="content">
-            <note-editor class="editor"/>
+            <note-editor class="editor" v-model="content"/>
 	</ion-content>
     </ion-page>
 </template>
@@ -23,7 +23,9 @@ export default {
     },    
 
     data() {
+        window.lol = this;
         return {
+            content: "gg"
         };
     },
 
