@@ -3,7 +3,7 @@
         <h1 class="title quartz-shadow-2-neu">
             <quartz-icon-block :icon="icon">{{ noteData.title }}</quartz-icon-block>
         </h1>
-        <pre class="content">{{ noteData.content }}</pre>
+        <div class="ProseMirror" v-html="noteData.content"></div>
     </div>
 </template>
 
@@ -40,8 +40,7 @@ export default {
 <style lang="scss" scoped>
     .note {
         --default-note-color: var(--quartz-color-25);
-        .content {
-            background-color: var(--quartz-color-25);
+        /*.content {
             overflow-x: hidden;
             overflow-y: auto;
             display: block;
@@ -53,6 +52,9 @@ export default {
             tab-size: 4;
             white-space: pre-wrap;
             padding: 16px;
+        }*/
+        .ProseMirror {
+            margin: 30px 10px;
         }
         
         &.has-color {

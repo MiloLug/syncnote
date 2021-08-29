@@ -5,6 +5,14 @@
                 :note-data="note"
                 v-if="note"
             />
+            <quartz-button
+                type="button"
+                class="edit-button"
+                shadow="center"
+                @click="onEditClick"
+            >
+                {{tr`Edit`}}
+            </quartz-button>
         </ion-content>
     </ion-page>
 </template>
@@ -12,6 +20,8 @@
 <script lang="js">
 import { IonPage } from '@ionic/vue';
 import NoteView from '../components/NoteView.vue';
+import QuartzButton from '../components/QuartzButton';
+import { tr } from '../localization';
 
 export default {
     name: 'Note',
@@ -31,10 +41,17 @@ export default {
 
     data() {
         return {
+            tr
         };
     },
 
     methods: {
+        onEditClick() {
+            this.$router.push({
+                name: "note-edit",
+                params: {id: this.$route.params.id}
+            });
+        }
     }
 }
 </script>
