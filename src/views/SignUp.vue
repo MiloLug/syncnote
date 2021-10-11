@@ -6,25 +6,27 @@
                     format="login"
                     :icon="folderOpenOutline"
                     class="input-line"
-                    :placeholder="tr`Login *`"
-                    v-model="karavka"
+                    :placeholder="$lang.tr`Login *`"
+                    v-model="username"
                 />
                 <quartz-input
                     format="email"
                     :icon="mailOutline"
                     class="input-line"
-                    :placeholder="tr`Email`"
+                    :placeholder="$lang.tr`Email`"
+                    v-model="email"
                 />
                 <quartz-input
                     format="password"
                     :icon="keyOutline"
                     class="input-line"
-                    :placeholder="tr`Password *`"
+                    :placeholder="$lang.tr`Password *`"
+                    v-model="password"
                 />
                 
                 <div class="input-line controls">
                     <quartz-button type="submit" class="submit-button" shadow="center">
-                        {{tr`Sign Up`}}
+                        {{ $lang.tr`Sign Up` }}
                     </quartz-button>
                 </div>
             </form>
@@ -37,7 +39,6 @@ import { IonPage } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
-import { tr } from '../localization';
 
 export default {
     name: 'SignUp',
@@ -53,8 +54,10 @@ export default {
             keyOutline,
             mailOutline,
             folderOpenOutline,
-            karavka: "",
-            tr
+
+            username: "",
+            email: "",
+            password: ""
         };
     },
     methods: {
@@ -63,7 +66,21 @@ export default {
         },
         onSubmit(e) {
             e.preventDefault();
+            this.signUp();
             return false;
+        },
+        async signUp() {
+            console.log({
+                "username": this.username,
+                "email": this.email,
+                "password": this.password
+            });
+            await this.$store.dispatch('user/startRegister', {
+                "username": this.username,
+                "email": this.email,
+                "password": this.password
+            });
+            this.$router.push('/');
         }
     }
 }

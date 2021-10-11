@@ -35,11 +35,11 @@
 </template>
 
 <script lang="js">
+import axios from 'axios';
 import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import QuartzBar from './components/QuartzBar';
 // import { BarcodeScanner } from '@ionic-native/barcode-scanner';
 import { lockOpenOutline, homeOutline, syncOutline, gridOutline} from 'ionicons/icons';
-import { tr } from './localization';
 
 export default {
     name: "App",
@@ -48,31 +48,36 @@ export default {
         IonRouterOutlet,
         QuartzBar
     },
-    data() {
-        return {
-            quartzBarContent: [
+    computed: {
+        quartzBarContent() {
+            return [
                 {
                     icon: homeOutline,
-                    name: tr`Home`,
+                    name: this.$lang.tr`Home`,
                     action: () => this.$router.push("/")
                 },
                 {
                     icon: syncOutline,
-                    name: tr`Syncronization`,
-                    items: [
+                    name: this.$lang.tr`Syncronization`,
+                    items: this.$store.state.user.isAuthenticated ? [
                         {
-                            name: tr`Sign Up`,
+                            name: this.$lang.tr`Log Out`,
+                            action: () => this.$store.dispatch('user/logout')
+                        }
+                    ] : [
+                        {
+                            name: this.$lang.tr`Sign Up`,
                             action: () => this.$router.push({name: "sign-up"})
                         },
                         {
-                            name: tr`Sign In`,
+                            name: this.$lang.tr`Sign In`,
                             action: () => this.$router.push({name: "sign-in"})
                         }
                     ]
                 },
                 {
                     icon: lockOpenOutline,
-                    name: tr`Safety`,
+                    name: this.$lang.tr`Safety`,
                     items: [
                         {
                             name:"test editor",
@@ -97,18 +102,39 @@ export default {
                 },
                 {
                     icon: gridOutline,
-                    name: tr`Other`,
+                    name: this.$lang.tr`Other`,
                     items: [
                         {
                             name:"item"
                         }
                     ]
                 }
-            ]
+            ];
+        }
+    },
+    data() {
+        return {
+        
         };
     },
+    async created() {
+        axios.interceptors.response.use(undefined, async err => {
+            // logout the user when they gets at least one 401
+            if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+                this.$store.dispatch('user/logout');
+            }
+            throw err;
+        });
+
+        // TODO: remove this
+        window.gg = this;
+
+        // init the stuff
+        await this.$store.dispatch("user/init");
+        await this.$store.dispatch("notes/updateList");
+        this.$lang.setLang();
+    },
     mounted() {
-        this.$store.dispatch("notes/updateList");
         window.addEventListener('keyboardDidShow', this.onKeyboardDidShow);
         window.addEventListener('keyboardDidHide', this.onKeyboardDidHide);
     },
@@ -117,9 +143,11 @@ export default {
         //   this.lol = (await BarcodeScanner.scan()).text;
         // }
         onKeyboardDidShow() {
+            // hide the bar
             this.$nextTick(()=>document.querySelector('body').classList.add('hide-main-bar'));
         },
         onKeyboardDidHide() {
+            // show the bar
             document.querySelector('body').classList.remove('hide-main-bar');
         }
     },

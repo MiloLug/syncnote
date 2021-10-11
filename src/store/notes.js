@@ -9,7 +9,7 @@ export default {
     mutations: {
     },
     actions: {
-        async updateList({ state }) {
+        async updateNotes({ state }) {
             const noteStorage = await NoteStorage;
             window.noteStorage = noteStorage;
             const tmpList = {};
@@ -17,6 +17,14 @@ export default {
                 tmpList[key] = value;
             });
             state.notesList = tmpList;
+        },
+        async saveNotes({ state }) {
+            const noteStorage = await NoteStorage;
+            
+            for(const [id, note] of Object.entries(state.notesList)){
+                if(note?.changedLocally)
+                    noteStorage.set(id, note);
+            }
         }
     },
     modules: {

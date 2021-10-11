@@ -1,32 +1,29 @@
-import enUS from './en-US.json';
+import { reactive } from 'vue';
+import dictionaries from './dictionaries.js';
 
+export default {
+    install(app) {
+        app.config.globalProperties.$lang = reactive({
+            base: "en",
+            country: "us",
 
-const dictionaries = {
-    '*': enUS,
-    'en': {
-        '*': enUS,
-        'us': enUS
+            dictionary: {},
+
+            setLang(langCode){
+                langCode = (langCode ?? navigator.language).toLowerCase().split('-');
+                this.base = langCode[0] ?? '*';
+                this.country = langCode[1] ?? '*';
+                const baseGroup = dictionaries[this.base];
+                this.dictionary = baseGroup
+                    ? baseGroup[this.country] ?? baseGroup['*']
+                    : dictionaries['*'];
+            },
+
+            tr(key){
+                key = Array.isArray(key) ? key[0] : key;
+                return this.dictionary[key] ?? key;
+            }
+        });
     }
-};
-const fullLang = navigator.language.split('-');
-const currentLang = {
-    base: fullLang[0],
-    country: fullLang[1].toLowerCase()
-};
-
-const baseGroup = dictionaries[currentLang.base];
-const primaryDictionary = baseGroup
-    ? baseGroup[currentLang.country] ?? baseGroup['*']
-    : dictionaries['*'];
-
-function tr(key) {
-    return primaryDictionary[key] ?? key;
-}
-
-export {
-    dictionaries,
-    currentLang,
-    primaryDictionary,
-    tr,
 };
 

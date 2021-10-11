@@ -104,7 +104,7 @@
     </div>
     <div class="editor-content-wrapper">
         <editor-content
-            :data-placeholder="tr`Start writing`"
+            :data-placeholder="$lang.tr`Start writing`"
             class="editor-content"
             :editor="editor"
         />
@@ -119,7 +119,6 @@ import Placeholder from '@tiptap/extension-placeholder';
 import { Indent } from '../utils/tiptap-indent';
 import { IonIcon } from '@ionic/vue';
 import { listOutline, codeOutline, returnUpForwardOutline, returnUpBackOutline } from 'ionicons/icons';
-import { tr } from '../localization';
 
 export default {
     components: {
@@ -150,7 +149,6 @@ export default {
             codeOutline,
             returnUpForwardOutline,
             returnUpBackOutline,
-            tr
         }
     },
 

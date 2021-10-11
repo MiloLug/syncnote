@@ -1,5 +1,5 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from 'vue';
+import App from './App.vue';
 import router from './router';
 
 import { IonicVue } from '@ionic/vue';
@@ -19,18 +19,21 @@ import './styles/variables.scss';
 /* Quartz theming tools */
 import './styles/quartz.scss';
 
-
 /* Quartz libs */
 import quartzIonicEvents from '@quartz-vision/ionic-events';
 
 import store from './store/index.js';
+
+// localization module
+import localization from './localization';
 
 
 const app = createApp(App)
   .use(store)
   .use(IonicVue)
   .use(router)
-  .use(quartzIonicEvents);
+  .use(quartzIonicEvents)
+  .use(localization);
 
 router.isReady().then(() => {
   app.mount('#app');
