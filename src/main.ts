@@ -19,6 +19,8 @@ import './styles/variables.scss';
 /* Quartz theming tools */
 import './styles/quartz.scss';
 
+import './styles/quartz-tiptap.scss';
+
 /* Quartz libs */
 import quartzIonicEvents from '@quartz-vision/ionic-events';
 

@@ -1,7 +1,11 @@
 <template>
     <ion-page>
         <ion-content class="content">
-            <note-editor class="editor" v-model="content"/>
+            <note-editor
+                class="editor"
+                v-model="note.content"
+                v-if="note"
+            />
 	</ion-content>
     </ion-page>
 </template>
@@ -20,12 +24,15 @@ export default {
     },
 
     computed: {
-    },    
+        note() {
+            return this.$store.state.notes.notesList[
+                this.$route.params.id
+            ];
+        },
+    },
 
     data() {
-        window.lol = this;
         return {
-            content: "gg"
         };
     },
 
