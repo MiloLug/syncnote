@@ -55,6 +55,8 @@ export default {
         }*/
         .ProseMirror {
             margin: 30px 10px;
+            word-break: break-word;
+            word-wrap: break-word;
         }
         
         &.has-color {

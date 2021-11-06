@@ -1,7 +1,7 @@
 import { createStore } from 'vuex';
 
-import notes from './notes.js';
-import user from './user.js';
+import note from './note';
+import user from './user';
 
 export default createStore({
     state: {
@@ -12,7 +12,7 @@ export default createStore({
     actions: {
     },
     modules: {
-        notes,
+        note,
         user
     }
 });

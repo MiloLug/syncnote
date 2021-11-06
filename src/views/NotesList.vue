@@ -6,7 +6,7 @@
                     <note-card
                         v-quartz:long-tap="onLongTap"
                         class="note-card"
-                        v-for="(note, id) in $store.state.notes.notesList"
+                        v-for="(note, id) in $store.state.note.notes"
                         @click="onCardClick(id, note)"
                         :key="note"
                         :note-data="note"
@@ -67,7 +67,7 @@ export default {
     .note-card {
         margin: 15px 20px;
         width: calc(100% - 40px);
-	max-width: 344px;
+        max-width: 344px;
     }
     .input-line.controls {
         text-align: right;

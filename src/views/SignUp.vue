@@ -61,9 +61,6 @@ export default {
         };
     },
     methods: {
-        test() {
-            console.log(this.karavka);
-        },
         onSubmit(e) {
             e.preventDefault();
             this.signUp();
@@ -71,14 +68,14 @@ export default {
         },
         async signUp() {
             console.log({
-                "username": this.username,
-                "email": this.email,
-                "password": this.password
+                username: this.username,
+                email: this.email,  
+                password: this.password
             });
             await this.$store.dispatch('user/startRegister', {
-                "username": this.username,
-                "email": this.email,
-                "password": this.password
+                username: this.username,
+                email: this.email,
+                password: this.password
             });
             this.$router.push('/');
         }

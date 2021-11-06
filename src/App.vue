@@ -131,7 +131,7 @@ export default {
 
         // init the stuff
         await this.$store.dispatch("user/init");
-        await this.$store.dispatch("notes/updateList");
+        await this.$store.dispatch("note/collectNotes");
         this.$lang.setLang();
     },
     mounted() {

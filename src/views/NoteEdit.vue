@@ -1,7 +1,7 @@
 <template>
     <ion-page>
         <ion-content class="content">
-            <note-editor
+            <text-editor
                 class="editor"
                 v-model="note.content"
                 v-if="note"
@@ -12,7 +12,7 @@
 
 <script lang="js">
 import { IonPage } from '@ionic/vue';
-import NoteEditor from '../components/NoteEditor.vue';
+import TextEditor from '../components/TextEditor.vue';
 
 
 export default {
@@ -20,12 +20,12 @@ export default {
 
     components: {
         IonPage,
-        NoteEditor
+        TextEditor
     },
 
     computed: {
         note() {
-            return this.$store.state.notes.notesList[
+            return this.$store.state.note.notes[
                 this.$route.params.id
             ];
         },

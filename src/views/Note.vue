@@ -11,7 +11,7 @@
                 shadow="center"
                 @click="onEditClick"
             >
-                {{tr`Edit`}}
+                {{ $lang.tr`Edit` }}
             </quartz-button>
         </ion-content>
     </ion-page>
@@ -21,7 +21,6 @@
 import { IonPage } from '@ionic/vue';
 import NoteView from '../components/NoteView.vue';
 import QuartzButton from '../components/QuartzButton';
-import { tr } from '../localization';
 
 export default {
     name: 'Note',
@@ -33,16 +32,14 @@ export default {
 
     computed: {
         note() {
-            return this.$store.state.notes.notesList[
+            return this.$store.state.note.notes[
                 this.$route.params.id
             ];
         }
     },    
 
     data() {
-        return {
-            tr
-        };
+        return {};
     },
 
     methods: {
@@ -75,7 +72,7 @@ export default {
     .note-card {
         margin: 15px 20px;
         width: calc(100% - 40px);
-	max-width: 344px;
+        max-width: 344px;
     }
     .input-line.controls {
         text-align: right;

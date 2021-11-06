@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-import { UserStorage } from './Storage.js';
+import { UserStorage } from './storage';
 import { BASE_URL } from '../api.settings.js';
 
 
