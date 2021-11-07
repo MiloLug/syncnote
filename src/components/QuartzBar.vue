@@ -15,7 +15,7 @@
                 >
                     <ion-icon 
                         class="quartz-bar__primary-nav__icon"
-			:md="entry.icon"
+                        :md="entry.icon"
                         :ios="entry.icon"
                     ></ion-icon>
                 </button>
@@ -28,7 +28,7 @@
                         @click="entryOnClick(item)"
                         v-bind:key="item"
                     >
-                        <div class="name">{{item.name}}</div>
+                        <div class="name">{{ $lang.tr(item.name) }}</div>
                     </button>
                 </div>
             </div>
@@ -119,7 +119,7 @@ export default {
 
     .quartz-bar-bg {
         display: block;
-	position: fixed;
+        position: fixed;
         width: 100%;
         height: 100%;
         top: -100%;

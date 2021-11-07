@@ -65,6 +65,7 @@ export default {
     
     .icon-block__icon {
         margin-right: 10.3px;
+        color: inherit;
     }
     .icon-right .icon-block__icon {
         margin-right: unset;

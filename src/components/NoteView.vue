@@ -40,23 +40,16 @@ export default {
 <style lang="scss" scoped>
     .note {
         --default-note-color: var(--quartz-color-25);
-        /*.content {
-            overflow-x: hidden;
-            overflow-y: auto;
-            display: block;
-            word-wrap: break-word;
-            word-break: break-all;
-            overflow: hidden;
-            height: 220px;
-            white-space: pre;
-            tab-size: 4;
-            white-space: pre-wrap;
-            padding: 16px;
-        }*/
+
         .ProseMirror {
             margin: 30px 10px;
             word-break: break-word;
             word-wrap: break-word;
+            user-select: text;
+
+            ::v-deep(p):empty::after {
+                content: "\00A0";
+            }
         }
         
         &.has-color {
@@ -71,6 +64,9 @@ export default {
             padding: 11px 14px;
             border-radius: 40px;
             font-size: 23px;
+            word-break: break-word;
+            word-wrap: break-word;
+            user-select: text;
         }
     }
 </style>

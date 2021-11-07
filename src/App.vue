@@ -53,31 +53,31 @@ export default {
             return [
                 {
                     icon: homeOutline,
-                    name: this.$lang.tr`Home`,
+                    name: 'Home',
                     action: () => this.$router.push("/")
                 },
                 {
                     icon: syncOutline,
-                    name: this.$lang.tr`Syncronization`,
+                    name: 'Syncronization',
                     items: this.$store.state.user.isAuthenticated ? [
                         {
-                            name: this.$lang.tr`Log Out`,
+                            name: 'Log Out',
                             action: () => this.$store.dispatch('user/logout')
                         }
                     ] : [
                         {
-                            name: this.$lang.tr`Sign Up`,
+                            name: 'Sign Up',
                             action: () => this.$router.push({name: "sign-up"})
                         },
                         {
-                            name: this.$lang.tr`Sign In`,
+                            name: 'Sign In',
                             action: () => this.$router.push({name: "sign-in"})
                         }
                     ]
                 },
                 {
                     icon: lockOpenOutline,
-                    name: this.$lang.tr`Safety`,
+                    name: 'Safety',
                     items: [
                         {
                             name:"test editor",
@@ -102,7 +102,7 @@ export default {
                 },
                 {
                     icon: gridOutline,
-                    name: this.$lang.tr`Other`,
+                    name: 'Other',
                     items: [
                         {
                             name:"item"
@@ -114,10 +114,12 @@ export default {
     },
     data() {
         return {
-        
+            stopLoop: false
         };
     },
     async created() {
+        this.$lang.setLang();
+
         axios.interceptors.response.use(undefined, async err => {
             // logout the user when they gets at least one 401
             if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
@@ -126,34 +128,53 @@ export default {
             throw err;
         });
 
+        axios.interceptors.request.use(config => {
+            config.url = config.url.replace(/{{lang}}/gmi, this.$lang.tr`__lang_code__`);
+            return config;
+        });
+
         // TODO: remove this
         window.gg = this;
 
         // init the stuff
         await this.$store.dispatch("user/init");
         await this.$store.dispatch("note/collectNotes");
-        this.$lang.setLang();
     },
     mounted() {
         window.addEventListener('keyboardDidShow', this.onKeyboardDidShow);
         window.addEventListener('keyboardDidHide', this.onKeyboardDidHide);
+        window.addEventListener('beforeunload', this.saveLocalNotes);
+        document.addEventListener("pause", this.saveLocalNotes, false);
+        document.addEventListener("resign", this.saveLocalNotes, false);
+
+        const loop = async () => {
+            if(this.stopLoop) return;
+            await this.saveLocalNotes();
+            setTimeout(loop, 5000);
+        };
     },
     methods: {
         // openScanner: async function(){
         //   this.lol = (await BarcodeScanner.scan()).text;
         // }
         onKeyboardDidShow() {
-            // hide the bar
-            this.$nextTick(()=>document.querySelector('body').classList.add('hide-main-bar'));
+            this.$nextTick(()=>document.querySelector('body').classList.add('keyboard-on'));
         },
         onKeyboardDidHide() {
-            // show the bar
-            document.querySelector('body').classList.remove('hide-main-bar');
+            document.querySelector('body').classList.remove('keyboard-on');
+        },
+        async saveLocalNotes() {
+            await this.$store.dispatch('note/saveLocalNotes');
         }
     },
     unmounted() {
         window.removeEventListener('keyboardDidShow', this.onKeyboardDidShow);
         window.removeEventListener('keyboardDidHide', this.onKeyboardDidHide);
+        window.removeEventListener('beforeunload', this.saveLocalNotes);
+        document.removeEventListener("pause", this.saveLocalNotes);
+        document.removeEventListener("resign", this.saveLocalNotes);
+
+        this.stopLoop = true;
     }
 }
 // import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
@@ -258,7 +279,7 @@ export default {
         display: initial;
     }
     
-    .hide-main-bar {
+    .keyboard-on {
         #main-bar {
             display: none;
         }

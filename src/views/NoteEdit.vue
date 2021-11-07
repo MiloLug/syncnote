@@ -1,18 +1,19 @@
 <template>
     <ion-page>
-        <ion-content class="content">
-            <text-editor
+        <ion-content class="note-edit-content">
+            <note-editor
                 class="editor"
-                v-model="note.content"
-                v-if="note"
+                v-model="noteOrigin"
+                v-if="noteOrigin"
+                :key="noteOrigin?.id"
             />
-	</ion-content>
+        </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
-import { IonPage } from '@ionic/vue';
-import TextEditor from '../components/TextEditor.vue';
+import { IonPage, IonContent } from '@ionic/vue';
+import NoteEditor from '../components/NoteEditor.vue';
 
 
 export default {
@@ -20,24 +21,56 @@ export default {
 
     components: {
         IonPage,
-        TextEditor
+        NoteEditor,
+        IonContent
     },
 
     computed: {
-        note() {
-            return this.$store.state.note.notes[
-                this.$route.params.id
-            ];
+        noteOrigin: {
+            get() {
+                // so, without passing an id, I can use it in create mode
+                if(!this.$route.params.id)
+                    return this.note || {
+                        id: Math.random().toString(16).slice(2)
+                    };
+
+                const origin = this.$store.state.note.notes[this.$route.params.id];
+
+                // return only a copy
+                if(origin){
+                    return {
+                        ...origin,
+                        tags: [...origin.tags]
+                    }
+                }
+
+                return undefined;
+            },
+            set(value) {
+                this.note = value;
+            }
+        }
+    },
+
+    watch: {
+        note(value) {
+            if(value.title || value.content)
+                this.$store.dispatch('note/commitNote', value);
         },
     },
 
     data() {
         return {
+            note: null
         };
     },
 
     methods: {
-    }
+    },
+
+    mounted(){
+        document.querySelector('.note-edit-content')?.scrollToTop?.(1000);
+    },
 }
 </script>
 

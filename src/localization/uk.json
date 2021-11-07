@@ -1,5 +1,14 @@
 {
-    "Login": "Вхід",
+    "__lang_code__": "uk",
+    
+    "Login|field": "Логін",
     "Email": "E-mail",
-    "Sign Up": "Реєстрація"
+    "Sign Up": "Реєстрація",
+    "Title|note editor field": "Заголовок",
+    "Search|notes list field": "Шукати (заголовок)",
+
+    "Updated at asc|ordering": "Спочатку старі",
+    "Updated at desc|ordering": "Спочатку нові",
+    "Title asc|ordering": "За заголовком (А-Я)",
+    "Title desc|ordering": "За заголовком (Я-А)"
 }

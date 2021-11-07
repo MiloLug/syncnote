@@ -6,7 +6,7 @@
                     format="login"
                     :icon="folderOpenOutline"
                     class="input-line"
-                    :placeholder="$lang.tr`Login *`"
+                    :placeholder="$lang.tr`Login|field` + ' *'"
                     v-model="username"
                 />
                 <quartz-input
@@ -20,7 +20,7 @@
                     format="password"
                     :icon="keyOutline"
                     class="input-line"
-                    :placeholder="$lang.tr`Password *`"
+                    :placeholder="$lang.tr`Password` + ' *'"
                     v-model="password"
                 />
                 
@@ -74,7 +74,7 @@ export default {
             });
             await this.$store.dispatch('user/startRegister', {
                 username: this.username,
-                email: this.email,
+                email: this.email || null,
                 password: this.password
             });
             this.$router.push('/');
@@ -90,7 +90,6 @@ export default {
         align-items: center;
         margin-top: 40px;
     }
-
 
     .input-line {
         margin: 14px 0px;

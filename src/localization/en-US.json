@@ -1,5 +1,14 @@
 {
-    "Login": "Login",
+    "__lang_code__": "en-us",
+
+    "Login|field": "Login",
     "Email": "Email",
-    "Sign Up": "Sign Up"
+    "Sign Up": "Sign Up",
+    "Title|note editor field": "Title",
+    "Search|notes list field": "Search (title)",
+
+    "Updated at asc|ordering": "Oldest first",
+    "Updated at desc|ordering": "Newest first",
+    "Title asc|ordering": "By title (A-Z)",
+    "Title desc|ordering": "By title (Z-A)"
 }

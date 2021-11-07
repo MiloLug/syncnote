@@ -196,7 +196,7 @@ export default {
     border-radius: 0px 0px 8px 8px;
     padding: 10px;
     background-color: var(--quartz-color-15-contrast);
-    border: 1px solid #222526;
+    border: none;
     box-shadow: var(--quartz-shadow-center), var(--quartz-shadow-left);
     overflow-x: auto;
  

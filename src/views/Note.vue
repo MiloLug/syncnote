@@ -1,33 +1,38 @@
 <template>
     <ion-page>
-        <ion-content class="content">
+        <ion-content class="note-view-content">
             <note-view
                 :note-data="note"
                 v-if="note"
             />
-            <quartz-button
-                type="button"
-                class="edit-button"
-                shadow="center"
-                @click="onEditClick"
-            >
-                {{ $lang.tr`Edit` }}
-            </quartz-button>
+            <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+                <ion-fab-button
+                    color="dark"
+                    class="btn-edit"
+                    @click="onEditClick"
+                >
+                    <ion-icon :icon="pencil" class="icon"/>
+                </ion-fab-button>
+            </ion-fab>
         </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
-import { IonPage } from '@ionic/vue';
+import { IonPage, IonContent, IonFab, IonFabButton, IonIcon } from '@ionic/vue';
+import { pencil } from 'ionicons/icons';
 import NoteView from '../components/NoteView.vue';
-import QuartzButton from '../components/QuartzButton';
 
 export default {
     name: 'Note',
 
     components: {
-        IonPage,
         NoteView,
+        IonPage,
+        IonContent,
+        IonFab,
+        IonFabButton,
+        IonIcon
     },
 
     computed: {
@@ -39,7 +44,9 @@ export default {
     },    
 
     data() {
-        return {};
+        return {
+            pencil
+        };
     },
 
     methods: {
@@ -49,7 +56,11 @@ export default {
                 params: {id: this.$route.params.id}
             });
         }
-    }
+    },
+
+    mounted(){
+        document.querySelector('.note-view-content')?.scrollToTop?.(1000);
+    },
 }
 </script>
 
@@ -76,6 +87,11 @@ export default {
     }
     .input-line.controls {
         text-align: right;
+    }
+
+    .btn-edit .icon {
+        color: var(--quartz-color-1);
+        font-size: 24px;
     }
 
     

@@ -1,6 +1,6 @@
 <template>
     <button class="card" :style="cssVars" :class="mainClasses">
-        <div class="info">{{ new Date(noteData.updatedAt).toLocaleDateString() }}</div>
+        <div class="info">{{ new Date(noteData.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
         <div class="title">
             <quartz-icon-block :icon="icon">{{ noteData.title }}</quartz-icon-block>
         </div>
@@ -85,6 +85,9 @@ export default {
     
         .title {
             margin-bottom: 10px;
+            text-align: left;
+            word-break: break-word;
+            word-wrap: break-word;
         }
     
         .preview {
