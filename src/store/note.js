@@ -88,11 +88,13 @@ export default {
             state.notesToSend[id] = 1;
         },
 
-        cleanSavingQueue(state) {
-            state.notesToSave = [];
+        cleanSavingQueue(state, id=null) {
+            if(id) state.notesToSave = {};
+            else delete state.notesToSave[id];
         },
-        cleanSendingQueue(state) {
-            state.notesToSend = [];
+        cleanSendingQueue(state, id=null) {
+            if(id) state.notesToSend = {};
+            else delete state.notesToSend[id];
         }
     },
     actions: {
@@ -114,12 +116,12 @@ export default {
         async saveLocalNotes({ state, commit }) {
             const noteStorage = await NoteStorage;
             const toSave = Object.keys(state.notesToSave);
+            const noProxyNotes = {...state.notes};
 
             commit('cleanSavingQueue');
-            console.log(toSave);
-            await Promise.all(toSave.map(
-                id => noteStorage.set(id, state.notes[id])
-            ))
+            for(const id of toSave){
+                noteStorage.set(id, noProxyNotes[id])
+            }
         },
 
         async addNote({ commit, dispatch }, note) {
