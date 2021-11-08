@@ -104,7 +104,7 @@ export default {
             return {
                 ...(this.modelValue ?? {}),
                 content: this.content,
-                titel: this.title,
+                title: this.title,
                 color: this.color,
                 tags: this.tags,
                 ...update

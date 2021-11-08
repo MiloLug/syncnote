@@ -19,7 +19,7 @@
             </div>
 
             <div class="notes-list-wrapper">
-                <div class="notes-list">
+                <div class="notes-list" :key="$store.state.note.orderedNotes">
                     <note-card
                         v-quartz:long-tap="onLongTap"
                         class="note-card"

@@ -4,22 +4,22 @@ import { NoteStorage } from './storage';
 // notes sorting functions:
 export const sortUpdatedAtAsc = notes => 
     Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].updatedAt > notes[b].updatedAt
+        (a, b) => notes[a].updatedAt - notes[b].updatedAt
     );
 
 export const sortUpdatedAtDesc = notes => 
     Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].updatedAt < notes[b].updatedAt
+        (a, b) => notes[b].updatedAt - notes[a].updatedAt
     );
 
 export const sortTitleAsc = notes => 
     Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].title > notes[b].title
+        (a, b) => notes[a].title.localeCompare(notes[b].title)
     );
 
 export const sortTitleDesc = notes => 
     Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].title < notes[b].title
+        (a, b) => notes[b].title.localeCompare(notes[a].title)
     );
 
 
@@ -77,8 +77,8 @@ export default {
             state.oversizedNotesSize = 0;
             state.oversizedNotes = {};
 
-            // newer records have bigger chances to get into the oversized
-            // since they will be handled in the end
+            // newer records have bigger chances to fall into the oversized list
+            // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(notes);
             for(const id of orderedIds){
                 const size = notes[id];
@@ -104,12 +104,13 @@ export default {
         },
 
         noteUpdate(state, {id, ...note}) {
+            // no dataSize = no size update
             if(note.dataSize !== undefined){
                 const oldSize = state.notes[id].dataSize;
                 const newSize = note.dataSize;
                 
                 if(state.dataSizeLimit !== -1){
-                    // so I can remove it from the oversized if it fits size limit
+                    // so I can remove it from the oversized if it fits the size limit
                     const realSizeRemain = state.dataSizeLimit - (state.dataSize - state.oversizedNotesSize);
 
                     if(state.oversizedNotes[id]){
@@ -153,8 +154,8 @@ export default {
             state.oversizedNotesSize = 0;
             state.oversizedNotes = {};
 
-            // newer records have bigger chances to get into the oversized
-            // since they will be handled in the end
+            // newer records have bigger chances to fall into the oversized list
+            // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(state.notes);
             let dataSize = 0;
             for(const id of orderedIds){
