@@ -1,0 +1,95 @@
+<template>
+    <ion-page>
+        <ion-content class="content">
+            <form class="data-form" @submit="onSubmit">
+                <quartz-input
+                    format="login"
+                    :icon="folderOpenOutline"
+                    class="input-line"
+                    :placeholder="$lang.tr`Login|field` + ' *'"
+                    v-model="username"
+                />
+                <quartz-input
+                    format="password"
+                    :icon="keyOutline"
+                    class="input-line"
+                    :placeholder="$lang.tr`Password` + ' *'"
+                    v-model="password"
+                />
+                
+                <div class="input-line controls">
+                    <quartz-button type="submit" class="submit-button" shadow="center">
+                        {{ $lang.tr`Sign In` }}
+                    </quartz-button>
+                </div>
+            </form>
+        </ion-content>
+    </ion-page>
+</template>
+
+<script lang="js">
+import { IonPage } from '@ionic/vue';
+import QuartzInput from '../components/QuartzInput';
+import QuartzButton from '../components/QuartzButton';
+import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
+
+export default {
+    name: 'SignIn',
+    components: {
+        IonPage,
+        QuartzInput,
+        QuartzButton,
+    },
+    data() {
+        return {
+            pricetagOutline,
+            callOutline,
+            keyOutline,
+            mailOutline,
+            folderOpenOutline,
+
+            username: "",
+            password: ""
+        };
+    },
+    methods: {
+        onSubmit(e) {
+            e.preventDefault();
+            this.signIn();
+            return false;
+        },
+        async signIn() {
+            await this.$store.dispatch('user/startAuth', {
+                username: this.username,
+                password: this.password
+            });
+            await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+            this.$router.push('/');
+        }
+    }
+}
+</script>
+
+<style scoped lang="scss">
+    .data-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .input-line {
+        margin: 14px 0px;
+        width: calc(100% - 40px);
+        
+        &.controls {
+            text-align: right;
+            margin-top: 40px;
+
+            .submit-button {
+                width: 100%;
+            }
+        }
+    }
+    
+</style>
