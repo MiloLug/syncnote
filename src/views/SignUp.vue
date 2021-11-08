@@ -77,6 +77,7 @@ export default {
                 email: this.email || null,
                 password: this.password
             });
+            await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
             this.$router.push('/');
         }
     }

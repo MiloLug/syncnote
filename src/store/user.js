@@ -13,6 +13,14 @@ export const REGISTER_URL = `${BASE_URL}/user/register/`;
 export const PROFILE_URL = `${BASE_URL}/user/profile/`;
 
 
+function set_axios_auth(token=null) {
+    if(token)
+        axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+    else
+        delete axios.defaults.headers.common['Authorization'];
+}
+
+
 export default {
     namespaced: true,
     state: () => ({
@@ -45,13 +53,17 @@ export default {
         }
     },
     actions: {
-        async init({commit, dispatch}) {
+        async init({ state, commit, dispatch }) {
             const userStorage = await UserStorage;
             
             commit('setAuth', {
                 token: await userStorage.get('token'),
                 isAuthenticated: await userStorage.get('isAuthenticated')
             });
+
+            if(state.isAuthenticated)
+                set_axios_auth(state.token);
+
             dispatch('getProfile');
         },
         async updateStorage({state}) {
@@ -66,7 +78,7 @@ export default {
             try {
                 const res = await axios.post(AUTH_URL, data);
                 const token = res.data.access;
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+                set_axios_auth(token);
                 
                 commit('authSuccess', token);
                 dispatch('updateStorage');
@@ -75,7 +87,7 @@ export default {
                 return res;
             }
             catch(e) {
-                delete axios.defaults.headers.common['Authorization'];
+                set_axios_auth();
                 
                 commit('authError', e);
                 dispatch('updateStorage');
@@ -88,7 +100,7 @@ export default {
             try {
                 const res = await axios.post(REGISTER_URL, data);
                 const token = res.data.access;
-                axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
+                set_axios_auth(token);
                 
                 commit('authSuccess', token);
                 dispatch('updateStorage');
@@ -97,7 +109,7 @@ export default {
                 return res;
             }
             catch(e) {
-                delete axios.defaults.headers.common['Authorization'];
+                set_axios_auth();
                 
                 commit('authError', e);
                 dispatch('updateStorage');

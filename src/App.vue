@@ -62,7 +62,11 @@ export default {
                     items: this.$store.state.user.isAuthenticated ? [
                         {
                             name: 'Log Out',
-                            action: () => this.$store.dispatch('user/logout')
+                            action: async () => {
+                                this.$router.push('/');
+                                await this.$store.dispatch('user/logout');
+                                await this.$store.dispatch('note/applyIdPairs');
+                            }
                         }
                     ] : [
                         {
@@ -138,7 +142,7 @@ export default {
 
         // init the stuff
         await this.$store.dispatch("user/init");
-        await this.$store.dispatch("note/collectNotes");
+        await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
     },
     mounted() {
         window.addEventListener('keyboardDidShow', this.onKeyboardDidShow);

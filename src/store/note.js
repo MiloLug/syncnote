@@ -1,4 +1,18 @@
+import axios from 'axios';
 import { NoteStorage } from './storage';
+
+import { BASE_URL } from '../api.settings.js';
+
+
+export const COLLECT_START = 1;
+export const COLLECT_SUCCESS = 2;
+export const COLLECT_ERROR = 3;
+export const UPLOAD_START = 4;
+export const UPLOAD_SUCCESS = 5;
+export const UPLOAD_ERROR = 6;
+
+export const GET_UPDATES_URL = `${BASE_URL}/notes/get-updates/`;
+export const SEND_UPDATES_URL = `${BASE_URL}/notes/send-updates/`;
 
 
 // notes sorting functions:
@@ -37,12 +51,38 @@ export default {
         notesToSave: {},  // {note id: bool}, notes to save locally
         notesToSend: {},  // {note id: bool}, notes to upload to the server
 
+        // using this, I won't need to update notes with a new id after uploading them
+        localRemoteIds: {},  // {local note id: remote note id}
+        remoteLocalIds: {},  // {remote note id: local note id}
+
         tags: {},  // {tag name: {note id: bool, ..., __count__: int}}
         orderedTagNames: [],  // [tag name]
         
         orderingFunction: sortUpdatedAtDesc,
+
+        status: null
     }),
     mutations: {
+        collectStart(state) {
+            state.status = COLLECT_START;
+        },
+        collectError(state) {
+            state.status = COLLECT_ERROR;
+        },
+        collectSuccess(state) {
+            state.status = COLLECT_SUCCESS;
+        },
+
+        uploadStart(state) {
+            state.status = UPLOAD_START;
+        },
+        uploadError(state) {
+            state.status = UPLOAD_ERROR;
+        },
+        uploadSuccess(state) {
+            state.status = UPLOAD_SUCCESS;
+        },
+
         newOrdering(state, orderingFunction=sortUpdatedAtDesc) {
             state.orderingFunction = orderingFunction;
             state.orderedNotes = orderingFunction(state.notes);
@@ -166,18 +206,63 @@ export default {
                     state.oversizedNotes[id] = 1,
                     state.oversizedNotesSize += size;
             }
+        },
+
+        addIdPair(state, {local, remote}) {
+            if(!state.localRemoteIds[local])
+                state.notesToSave[local] = 1;
+
+            state.localRemoteIds[local] = remote;
+            state.remoteLocalIds[remote] = local;
+        },
+
+        cleanIdPairs(state) {
+            state.localRemoteIds = {};
+            state.remoteLocalIds = {};
         }
     },
     actions: {
-        async collectNotes({ commit }) {
+        async collectNotes({ state, commit }, useServer=false) {
             const noteStorage = await NoteStorage;
             // TODO: remove this
             window.noteStorage = noteStorage;
 
             const tmpList = {};
-            await noteStorage.forEach((value, key, index) => {
+            await noteStorage.forEach((value, key) => {
                 tmpList[key] = value;
             });
+
+            if(useServer && state.status !== COLLECT_START) {
+                commit('collectStart');
+
+                const data = Object.values(tmpList).map(
+                    note => ({id: note.id, updated_at: new Date(note.updatedAt).toJSON()})
+                );
+                try {
+                    const res = await axios.post(GET_UPDATES_URL, data);
+                    commit('addNotesToSend', res.data?.notes_to_send ?? []);
+
+                    for(const note of res.data?.notes_updated ?? []){
+                        const id = state.remoteLocalIds[note.id] ?? note.id;
+
+                        tmpList[id] = {
+                            id: id,
+                            tags: note.tags ?? [],
+                            title: note.title ?? "",
+                            content: note.content ?? "",
+                            color: note.color ?? null,
+                            icon: note.icon ?? null,
+                            dataSize: note.data_size ?? (note.content ?? "").length,
+                            updatedAt: new Date(note.updated_at).getTime()
+                        }
+                    }
+
+                    commit('collectSuccess');
+                }
+                catch(e) {
+                    commit('collectError');
+                }
+            }
 
             commit('newNotes', tmpList);
             commit('notesOrderingUpdate');
@@ -187,15 +272,74 @@ export default {
         async saveLocalNotes({ state, commit }) {
             const noteStorage = await NoteStorage;
             const toSave = Object.keys(state.notesToSave);
-
             commit('cleanSavingQueue');
 
-            for(const id of toSave){
-                noteStorage.set(id, {
+            if(!toSave.length) return;
+
+            await Promise.all(toSave.map(
+                async id => {
+                    // if there is a new id (after uploading to the server),
+                    // I'll use it to update the note in the store
+                    const realId = state.localRemoteIds[id] ?? id;
+                    if(realId !== id)
+                        await noteStorage.remove(id);
+
+                    await noteStorage.set(realId, {
+                        ...state.notes[id],
+                        id: realId,
+                        tags: [...state.notes[id].tags]
+                    });
+                }
+            ));
+        },
+
+        async saveRemoteNotes({ state, commit }) {
+            const toSave = Object.keys(state.notesToSend);
+            commit('cleanSendingQueue');
+
+            if(!toSave.length) return;
+
+            commit('uploadStart');
+
+            const data = toSave.map(
+                id => ({
+                    local_id: state.localRemoteIds[id] ?? id,
                     ...state.notes[id],
-                    tags: [...state.notes[id].tags]
+                    tags: [...state.notes[id].tags],
+                    updated_at: new Date(state.notes[id].updatedAt).toJSON()
                 })
+            );
+
+            try {
+                const res = await axios.post(SEND_UPDATES_URL, data);
+                for(const localRemote of res.data ?? []){
+                    commit('addIdPair', {
+                        local: localRemote.local_id,
+                        remote: localRemote.remote_id
+                    });
+                }
+
+                commit('uploadSuccess');
+                return res;
             }
+            catch(e) {
+                commit('uploadError');
+                throw e;
+            }
+        },
+
+        async sync({ dispatch }, useServer=false) {
+            await dispatch('collectNotes', useServer);
+            if(useServer) {
+                await dispatch('saveRemoteNotes');
+                await dispatch('saveLocalNotes');
+            }
+        },
+
+        async applyIdPairs({ dispatch, commit }) {
+            await dispatch('saveLocalNotes');
+            commit('cleanIdPairs');
+            await dispatch('collectNotes');
         },
 
         async addNote({ commit }, note) {

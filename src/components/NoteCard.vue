@@ -1,8 +1,8 @@
 <template>
     <button class="card" :style="cssVars" :class="mainClasses">
-        <div class="info">{{ new Date(noteData.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
+        <div class="info">{{ new Date(noteData?.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
         <div class="title">
-            <quartz-icon-block :icon="icon">{{ noteData.title }}</quartz-icon-block>
+            <quartz-icon-block :icon="icon">{{ noteData?.title }}</quartz-icon-block>
         </div>
         <hr class="divider"/>
         <div class="preview">
@@ -38,13 +38,13 @@ export default {
     data() {
         return {
             mainClasses: [
-                {'has-color': !!this.noteData.color},
+                {'has-color': !!this.noteData?.color},
                 ...applyClasses(this)
             ],
             cssVars: {
-                '--note-color': this.noteData.color || 'var(--default-note-color)'
+                '--note-color': this.noteData?.color || 'var(--default-note-color)'
             },
-            icon: icons[this.noteData.iconName]
+            icon: icons[this.noteData?.iconName] ?? null
         };
     },
     methods: {
