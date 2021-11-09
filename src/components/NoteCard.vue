@@ -44,7 +44,7 @@ export default {
             cssVars: {
                 '--note-color': this.noteData?.color || 'var(--default-note-color)'
             },
-            icon: icons[this.noteData?.iconName] ?? null
+            icon: icons[this.noteData?.icon] ?? null
         };
     },
     methods: {
@@ -53,9 +53,7 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-    .card {
-        --default-note-color: var(--quartz-color-25);
-        
+    .card {        
         display: inline-flex;
         flex-direction: column;
         padding: 20px;

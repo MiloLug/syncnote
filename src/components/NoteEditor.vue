@@ -1,21 +1,98 @@
 <template>
-    <div class="note-editor">
-        <div class="input-panel">
-            <button class="icon-wrapper">
+    <div
+        class="note-editor"
+        :class="{'show-icon-menu': showIconMenu}"
+        :style="{'--note-color': color || 'var(--default-note-color)'}"
+    >
+        <div class="top-bar">
+            <button class="menu-btn" @click="onMenuBtnClick">
                 <ion-icon
                     class="icon"
                     :ios="icons[icon]"
                     :md="icons[icon]"
+                    :key="icon"
                     type="button"
                 ></ion-icon>
             </button>
+
             <quartz-input
                 format="text"
                 class="title"
                 :placeholder="$lang.tr`Title|note editor field`"
                 v-model="title"
                 shadow="2-neu-soft-contrast"
+                v-if="!showIconMenu"
             />
+            <template v-if="showIconMenu">
+                <quartz-input
+                    format="text"
+                    class="tag-input"
+                    :placeholder="$lang.tr`Tag|tag input field`"
+                    v-model="tag"
+                    shadow="2-neu-soft-contrast"
+                />
+                <quartz-button
+                    class="btn-add-tag"
+                    @click="onBtnAddTagClick"
+                >
+                    {{ $lang.tr`Add tag` }}
+                </quartz-button>
+            </template>
+
+            <div class="icon-menu" v-if="showIconMenu">
+                <div class="menu-bg"></div>
+
+                <div class="content screen1">
+                    <div class="row-selector colors">
+                        <button
+                            class="item empty"
+                            @click="onBtnColorClick(null)"
+                        ></button>
+                        <button
+                            class="item"
+                            v-for="itemColor in colors"
+                            :key="itemColor"
+                            :style="{'--note-color': itemColor}"
+                            @click="onBtnColorClick(itemColor)"
+                        ></button>
+                    </div>
+
+                    <div class="row-selector icons">
+                        <button
+                            class="item empty"
+                            @click="onBtnIconClick(null)"
+                        ></button>
+                        <button
+                            class="item"
+                            v-for="iconName in iconsToUse"
+                            :key="iconName"
+                            @click="onBtnIconClick(iconName)"
+                        >
+                            <ion-icon
+                                class="icon"
+                                :ios="icons[iconName]"
+                                :md="icons[iconName]"
+                                type="button"
+                            ></ion-icon>
+                        </button>
+                    </div>
+                    <hr class="divider"/>
+                    <div class="tags">
+                        <quartz-button
+                            class="tag"
+                            v-for="tagName in storeTags"
+                            :key="tagName"
+                            :class="{selected: tags.indexOf(tagName) !== -1}"
+                            @click="onBtnTagClick(tagName)"
+                        >
+                            {{ tagName }}
+                        </quartz-button>
+                        <p class="no-tags" v-if="!storeTags.length">
+                            {{ $lang.tr`No tags used` }}
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
         <text-editor
             class="text-editor"
@@ -27,6 +104,7 @@
 <script lang="js">
 import TextEditor from './TextEditor';
 import QuartzInput from './QuartzInput';
+import QuartzButton from './QuartzButton';
 import { IonIcon } from '@ionic/vue';
 import * as icons from 'ionicons/icons';
 
@@ -37,7 +115,8 @@ export default {
     components: {
         TextEditor,
         QuartzInput,
-        IonIcon
+        IonIcon,
+        QuartzButton
     },
 
     props: {
@@ -82,11 +161,25 @@ export default {
         },
         icon: {
             get() {
-                return this.modelValue?.icon ?? "banOutline";
+                return this.modelValue?.icon ?? null;
             },
             set(icon) {
                 this.$emit('update:modelValue', this.composeNote({icon}));
             }
+        },
+
+        storeTags() {
+            const used = [];
+            const others = [];
+
+            for(const tagName of this.$store.state.note.orderedTagNames)
+                (this.tags.indexOf(tagName) === -1 ? others : used).push(tagName);
+
+            // to add "virtual" tags that aren't presented in the store (creation time)
+            for(const tag of this.tags)
+                if(used.indexOf(tag) === -1) used.push(tag);
+
+            return [...used, ...others];
         }
     },
 
@@ -95,7 +188,11 @@ export default {
 
     data() {
         return {
-            icons
+            icons,
+            showIconMenu: false,
+            tag: "",
+            colors: ["#e35858", "#589be3", "#e3a058", "#5f9ea0"],
+            iconsToUse: ["airplane", "bulb", "alert", "globe", "today", "person"],
         };
     },
 
@@ -109,7 +206,38 @@ export default {
                 tags: this.tags,
                 ...update
             }
+        },
+
+        onMenuBtnClick() {
+            this.showIconMenu = !this.showIconMenu;
+        },
+
+        onBtnAddTagClick() {
+            const tag = this.tag.trim().toLowerCase();
+
+            if(tag && this.tags.indexOf(tag) === -1) {
+                this.tags = [...this.tags, tag];
+            }
+            this.tag = "";
+        },
+        onBtnTagClick(tag) {
+            if(this.tags.indexOf(tag) === -1)
+                this.tags = [...this.tags, tag];
+            else
+                this.tags = this.tags.filter(tagName => tagName !== tag);
+        },
+
+        onBtnColorClick(itemColor) {
+            this.color = itemColor;
+        },
+        onBtnIconClick(iconName) {
+            this.icon = iconName;
         }
+    },
+
+    beforeRouteLeave() {
+        this.showIconMenu = false;
+        console.log(123213);
     }
 }
 </script>
@@ -117,55 +245,149 @@ export default {
 <style lang="scss" scoped>
     @use "@/styles/utils/tools.scss";
 
-    .text-editor {
-        position: absolute;
-        top: 70px;
-        left: 0;
-        height: 100%;
-        width: 100%;
-    }
+    .note-editor {
+        --top-bar-height: 70px;
 
-    .input-panel {
-        display: flex;
-        background-color: var(--quartz-color-15-contrast);
-        height: 70px;
-        align-items: center;
-    }
-
-    .icon-wrapper {
-        cursor: pointer;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        color: var(--quartz-color-1);
-        min-width: 50px;
-        height: 50px;
-        background: cadetblue;
-        border-radius: 0px 50px 50px 0px;
-        font-size: 32px;
-        
-        .icon {
-            --ionicon-stroke-width: 20;
+        &.show-icon-menu {
+            overflow: hidden;
         }
-    }
 
-    .title {
-        width: 100%;
-        margin: auto 10px;
+        .top-bar {
+            display: flex;
+            background-color: var(--quartz-color-15-contrast);
+            height: var(--top-bar-height);
+            align-items: center;
+        }
 
-        ::v-deep(.input){
-            @include tools.placeholder {
-                color: var(--quartz-color-3);
+        .divider {
+            width: 100%;
+            background: linear-gradient(to right, var(--quartz-color-1-contrast) -30%, transparent 100%);
+            padding: 0;
+            margin-left: 0;
+            margin-bottom: 13px;
+            max-height: 2px;
+            min-height: 2px;
+        }
+
+        .row-selector {
+            overflow: auto;
+            max-width: 100%;
+            position: relative;
+            display: flex;
+            margin: 2px 0px;
+
+            &.icons .item {
+                border: 1px solid var(--quartz-color-4-contrast);
             }
 
-            box-shadow: var(--quartz-shadow-2-neu-soft-contrast), var(--quartz-inner-shadow-2-neu-concave-soft-contrast);
-            border-color: transparent;
-            color: var(--quartz-color-1);
+            .item {
+                min-width: 30px;
+                min-height: 30px;
+                background-color: var(--note-color);
+                border-radius: 50px;
+                margin: 2px 5px;
 
-            &:focus {
-                background-color: var(--quartz-color-4-contrast);
-                box-shadow: var(--quartz-shadow-2-neu-contrast);
-                border-width: 1px;
+                &.empty {
+                    background: transparent;
+                    border: 2px solid var(--quartz-color-4-contrast);
+                }
+
+                .icon {
+                    font-size: 19px;
+                }
+            }            
+        }
+
+        .icon-menu {
+            position: fixed;        
+            z-index: 999999;
+
+            .menu-bg {
+                position: fixed;
+                width: 100%;
+                height: 100%;
+                top: var(--top-bar-height);
+                left: 0;
+                background: #2324268a;
+                z-index: 1;
+            }
+
+            .content {
+                position: fixed;
+                display: inline-flex;
+                flex-direction: column;
+                background: var(--quartz-color-25);
+                z-index: 2;
+                width: calc(100% - 20px);
+                height: calc(100% - var(--top-bar-height) - 70px);
+                top: calc(var(--top-bar-height) + 10px);
+                left: 10px;
+                border-radius: 5px;
+                overflow: auto;
+                padding: 5px;
+
+                .tag {
+                    height: 28px;
+                    margin: 2px 2px;
+                    background: var(--quartz-color-3);
+                    color: rgba(var(--quartz-text-color-rgb), 0.5);
+
+                    &.selected {
+                        background: var(--quartz-color-15-contrast);
+                        color: var(--quartz-color-1);
+                    }
+                }
+            }
+        }
+
+        .btn-add-tag {
+            border-radius: 50px 0px 0px 50px;
+        }
+
+        .text-editor {
+            position: absolute;
+            top: var(--top-bar-height);
+            left: 0;
+            height: 100%;
+            width: 100%;
+        }
+
+        
+        .menu-btn {
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--quartz-color-1);
+            min-width: 50px;
+            height: 50px;
+            background-color: var(--note-color);
+            border-radius: 0px 50px 50px 0px;
+            font-size: 32px;
+            
+            .icon {
+                --ionicon-stroke-width: 20;
+            }
+        }
+
+        .title, .tag-input {
+            width: 100%;
+            margin: auto 10px;
+
+            ::v-deep(.input){
+                @include tools.placeholder {
+                    color: var(--quartz-color-3);
+                }
+
+                box-shadow: var(--quartz-shadow-2-neu-soft-contrast), var(--quartz-inner-shadow-2-neu-concave-soft-contrast);
+                border-color: transparent;
+                color: var(--quartz-color-1);
+
+                &:focus {
+                    background-color: var(--quartz-color-4-contrast);
+                    box-shadow: var(--quartz-shadow-2-neu-contrast);
+                    border-width: 1px;
+                }
             }
         }
     }

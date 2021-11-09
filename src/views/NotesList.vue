@@ -5,6 +5,7 @@
                 <quartz-input
                     format="text"
                     class="search"
+                    v-model="searchString"
                     :placeholder="$lang.tr`Search|notes list field`"
                     shadow="2-neu-soft-contrast"
                 />
@@ -19,11 +20,11 @@
             </div>
 
             <div class="notes-list-wrapper">
-                <div class="notes-list" :key="$store.state.note.orderedNotes">
+                <div class="notes-list" :key="$store.state.note.filteredNotes">
                     <note-card
                         v-quartz:long-tap="onLongTap"
                         class="note-card"
-                        v-for="id in $store.state.note.orderedNotes"
+                        v-for="id in $store.state.note.filteredNotes"
                         @click="onCardClick(id)"
                         :key="$store.state.note.notes[id]"
                         :note-data="$store.state.note.notes[id]"
@@ -65,7 +66,14 @@ import { IonPage, IonContent, IonFab, IonFabButton, IonIcon } from '@ionic/vue';
 import { add, swapVertical } from 'ionicons/icons';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
-import { sortUpdatedAtAsc, sortUpdatedAtDesc, sortTitleAsc, sortTitleDesc } from '../store/note';
+import {
+    sortUpdatedAtAsc,
+    sortUpdatedAtDesc,
+    sortTitleAsc,
+    sortTitleDesc,
+    // createTagsFilter,
+    createTitleFilter
+} from '../store/note';
 
 import NoteCard from '../components/NoteCard';
 
@@ -83,6 +91,13 @@ export default {
         QuartzButton
     },
 
+    watch: {
+        searchString(value) {
+            this.filters.search = value ? createTitleFilter(value) : null;
+            this.updateFiltering();
+        }
+    },
+
     data() {
         return {
             add,
@@ -94,7 +109,14 @@ export default {
                 {name: 'Updated at desc|ordering', fn: sortUpdatedAtDesc},
                 {name: 'Title asc|ordering', fn: sortTitleAsc},
                 {name: 'Title desc|ordering', fn: sortTitleDesc}
-            ]
+            ],
+
+            filters: {
+                search: null,
+                tags: null
+            },
+            searchString: "",
+            tagsSeelcted: {}
         };
     },
 
@@ -115,6 +137,13 @@ export default {
         onOrderingEntryClick(ordering) {
             this.$store.commit('note/newOrdering', ordering.fn);
             this.showOrderingMenu = false;
+        },
+
+        updateFiltering() {
+            this.$store.commit(
+                'note/newFiltering',
+                Object.values(this.filters).filter(v => !!v)
+            );
         },
 
         onSubmit(e) {

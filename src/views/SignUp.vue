@@ -67,11 +67,6 @@ export default {
             return false;
         },
         async signUp() {
-            console.log({
-                username: this.username,
-                email: this.email,  
-                password: this.password
-            });
             await this.$store.dispatch('user/startRegister', {
                 username: this.username,
                 email: this.email || null,

@@ -36,13 +36,28 @@ export const sortTitleDesc = notes =>
         (a, b) => notes[b].title.localeCompare(notes[a].title)
     );
 
+export const createTagsFilter = filterTags => state => noteId => {
+    for(const tagName of filterTags) {
+        if(!state.tags[tagName][noteId])
+            return false;
+    }
+    return true;
+};
+
+export const createTitleFilter = searchString => state => noteId =>
+    state.notes[noteId].title.indexOf(searchString) !== -1;
+
+
+let finishInitialization;
 
 export default {
     namespaced: true,
     state: () => ({
-        
+        initialized: new Promise((res, rej) => (finishInitialization = res)),
+
         notes: {},  // {id: Note}
         orderedNotes: [],  // [note id]
+        filteredNotes: [],  // [note id]
         oversizedNotes: {},  // {note id: bool}
         dataSize: 0,
         dataSizeLimit: -1,  // -1 = no restrictions
@@ -59,8 +74,7 @@ export default {
         orderedTagNames: [],  // [tag name]
         
         orderingFunction: sortUpdatedAtDesc,
-
-        status: null
+        filteringFunctions: [],
     }),
     mutations: {
         collectStart(state) {
@@ -85,19 +99,34 @@ export default {
 
         newOrdering(state, orderingFunction=sortUpdatedAtDesc) {
             state.orderingFunction = orderingFunction;
-            state.orderedNotes = orderingFunction(state.notes);
+            let notesIds = state.orderedNotes = orderingFunction(state.notes);
+
+            for(const fn of state.filteringFunctions){
+                notesIds = notesIds.filter(fn);
+            }
+            state.filteredNotes = notesIds;
+        },
+
+        newFiltering(state, filteringFunctions=[]) {
+            state.filteringFunctions = filteringFunctions.map(fn => fn(state));
+            let notesIds = state.orderedNotes;
+            
+            for(const fn of state.filteringFunctions){
+                notesIds = notesIds.filter(fn);
+            }
+            state.filteredNotes = notesIds;
         },
 
         tagsUpdate(state) {
             // to not disturb the original object
             const tmpTags = {};
-            for(const id of state.orderedNotes){
-                for(const tagName of state.notes[id].tags){
+            for(const note of Object.values(state.notes)){
+                for(const tagName of note.tags){
                     const tag = tmpTags[tagName] = tmpTags[tagName]
                         ? tmpTags[tagName]
                         : {__count__: 1};
 
-                    tag[id] = 1;
+                    tag[note.id] = 1;
                 }
             }
             // to show more popular tags first
@@ -108,7 +137,21 @@ export default {
         },
 
         notesOrderingUpdate(state) {
-            state.orderedNotes = state.orderingFunction(state.notes);
+            let notesIds = state.orderedNotes = state.orderingFunction(state.notes);
+
+            for(const fn of state.filteringFunctions){
+                notesIds = notesIds.filter(fn);
+            }
+            state.filteredNotes = notesIds;
+        },
+
+        notesFilteringUpdate(state) {
+            let notesIds = state.orderedNotes;
+
+            for(const fn of state.filteringFunctions){
+                notesIds = notesIds.filter(fn);
+            }
+            state.filteredNotes = notesIds;
         },
 
         newNotes(state, notes={}) {
@@ -267,6 +310,8 @@ export default {
             commit('newNotes', tmpList);
             commit('notesOrderingUpdate');
             commit('tagsUpdate');
+            
+            finishInitialization();
         },
 
         async saveLocalNotes({ state, commit }) {
@@ -324,7 +369,6 @@ export default {
             }
             catch(e) {
                 commit('uploadError');
-                throw e;
             }
         },
 
@@ -355,6 +399,26 @@ export default {
         },
 
         async updateNote({ state, commit }, note) {
+            const oldNote = state.notes[note.id];
+            let updateOrdering = false;
+            let updateTags = false;
+
+            // update the ordering only when it's needed
+            if(
+                state.orderingFunction === sortUpdatedAtDesc
+                || state.orderingFunction === sortUpdatedAtAsc
+                || note?.title !== oldNote.title
+            )
+                updateOrdering = true;
+            
+            // also don't update tags if they wasn't changed
+            if(
+                note?.tags !== undefined
+                && JSON.stringify(note.tags) !== JSON.stringify(oldNote.tags)
+            )
+                updateTags = true;
+
+
             const update = {
                 ...note,
                 updatedAt: Date.now()
@@ -364,25 +428,12 @@ export default {
             
             commit('noteUpdate', update);
 
-            const oldNote = state.notes[note.id];
-
-            // update the ordering only when it's needed
-            if(
-                state.orderingFunction === sortUpdatedAtDesc
-                || state.orderingFunction === sortUpdatedAtAsc
-                || note?.title !== oldNote.title
-            )
-                commit('notesOrderingUpdate');
-            
-            if(
-                note?.tags !== undefined
-                && JSON.stringify(note.tags) !== JSON.stringify(oldNote.tags)
-            )
-                commit('tagsUpdate');
+            updateOrdering && commit('notesOrderingUpdate');
+            updateTags && commit('tagsUpdate');
         },
 
         async commitNote({ state, dispatch }, note) {
-            if(state[note.id])
+            if(state.notes[note.id])
                 dispatch('updateNote', note);
             else
                 dispatch('addNote', note);

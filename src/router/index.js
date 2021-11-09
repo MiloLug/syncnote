@@ -18,7 +18,7 @@ const routes = [
         name: 'note-edit'
     },
     {
-        path: '/note-edit',
+        path: '/note-edit/:createId?',
         component: () => import('../views/NoteEdit.vue'),
         name: 'note-create'
     },
@@ -45,11 +45,20 @@ const router = createRouter({
     routes
 });
 
-router.beforeEach((to, from, next) => {
-    if((to.name === 'note' || to.name === 'note-edit') && !store.state.note.notes[to.params.id])
+router.beforeEach(async (to, from, next) => {
+    if(
+        (to.name === 'note' || to.name === 'note-edit')
+        && (await store.state.note.initialized, !store.state.note.notes[to.params.id])
+    )
         next('/');
+
+    // this was the only way to update it normally
+    else if(to.name === 'note-create')
+        to.params.createId = Math.random().toString(16).slice(2),
+        next();
+
     else
         next();
-})
+});
 
-export default router
+export default router;

@@ -35,7 +35,6 @@
 </template>
 
 <script lang="js">
-import axios from 'axios';
 import { IonApp, IonRouterOutlet } from '@ionic/vue';
 import QuartzBar from './components/QuartzBar';
 // import { BarcodeScanner } from '@ionic-native/barcode-scanner';
@@ -121,29 +120,7 @@ export default {
             stopLoop: false
         };
     },
-    async created() {
-        this.$lang.setLang();
 
-        axios.interceptors.response.use(undefined, async err => {
-            // logout the user when they gets at least one 401
-            if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
-                this.$store.dispatch('user/logout');
-            }
-            throw err;
-        });
-
-        axios.interceptors.request.use(config => {
-            config.url = config.url.replace(/{{lang}}/gmi, this.$lang.tr`__lang_code__`);
-            return config;
-        });
-
-        // TODO: remove this
-        window.gg = this;
-
-        // init the stuff
-        await this.$store.dispatch("user/init");
-        await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
-    },
     mounted() {
         window.addEventListener('keyboardDidShow', this.onKeyboardDidShow);
         window.addEventListener('keyboardDidHide', this.onKeyboardDidHide);
@@ -179,7 +156,7 @@ export default {
         document.removeEventListener("resign", this.saveLocalNotes);
 
         this.stopLoop = true;
-    }
+    },
 }
 // import { IonApp, IonContent, IonIcon, IonItem, IonLabel, IonList, IonListHeader, IonMenu, IonMenuToggle, IonNote, IonRouterOutlet, IonSplitPane } from '@ionic/vue';
 // import { defineComponent, ref } from 'vue';

@@ -29,10 +29,13 @@ export default {
         noteOrigin: {
             get() {
                 // so, without passing an id, I can use it in create mode
-                if(!this.$route.params.id)
-                    return this.note || {
-                        id: Math.random().toString(16).slice(2)
-                    };
+                if(!this.$route.params.id){
+                    if(this.note?.id !== this.$route.params.createId)
+                        return {
+                            id: this.$route.params.createId
+                        };
+                    return this.note;
+                }
 
                 const origin = this.$store.state.note.notes[this.$route.params.id];
 
@@ -71,6 +74,17 @@ export default {
     mounted(){
         document.querySelector('.note-edit-content')?.scrollToTop?.(1000);
     },
+
+    beforeRouteLeave(to, from, next) {
+        console.log(2321323);
+        this.note = null;
+        next();
+    },
+    beforeRouteUpdate(to, from, next) {
+        console.log(999999);
+        this.note = null;
+        next();
+    }
 }
 </script>
 

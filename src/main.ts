@@ -25,10 +25,9 @@ import './styles/quartz-tiptap.scss';
 import quartzIonicEvents from '@quartz-vision/ionic-events';
 
 import store from './store/index.js';
-
-// localization module
 import localization from './localization';
 
+import init from './init';
 
 const app = createApp(App)
   .use(store)
@@ -36,6 +35,8 @@ const app = createApp(App)
   .use(router)
   .use(quartzIonicEvents)
   .use(localization);
+
+init();
 
 router.isReady().then(() => {
   app.mount('#app');
