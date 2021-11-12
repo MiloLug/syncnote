@@ -4,7 +4,7 @@
             <form class="data-form" @submit="onSubmit">
                 <quartz-input
                     format="login"
-                    :icon="folderOpenOutline"
+                    :icon="personOutline"
                     class="input-line"
                     :placeholder="$lang.tr`Login|field` + ' *'"
                     v-model="username"
@@ -30,6 +30,8 @@
                     </quartz-button>
                 </div>
             </form>
+
+            <quartz-connection-banner/>
         </ion-content>
     </ion-page>
 </template>
@@ -38,7 +40,8 @@
 import { IonPage } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
-import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
+import { keyOutline, mailOutline, personOutline } from 'ionicons/icons';
+import QuartzConnectionBanner from "../components/QuartzConnectionBanner";
 
 export default {
     name: 'SignUp',
@@ -46,14 +49,13 @@ export default {
         IonPage,
         QuartzInput,
         QuartzButton,
+        QuartzConnectionBanner
     },
     data() {
         return {
-            pricetagOutline,
-            callOutline,
             keyOutline,
             mailOutline,
-            folderOpenOutline,
+            personOutline,
 
             username: "",
             email: "",
@@ -74,6 +76,10 @@ export default {
             });
             await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
             this.$router.push('/');
+
+            this.username = "";
+            this.email = "";
+            this.password = "";
         }
     }
 }

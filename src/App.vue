@@ -58,59 +58,31 @@ export default {
                 {
                     icon: syncOutline,
                     name: 'Syncronization',
-                    items: this.$store.state.user.isAuthenticated ? [
-                        {
-                            name: 'Log Out',
-                            action: async () => {
-                                this.$router.push('/');
-                                await this.$store.dispatch('user/logout');
-                                await this.$store.dispatch('note/applyIdPairs');
+                    items: this.$store.state.user.isAuthenticated
+                        ? [
+                            {
+                                name: 'Log Out',
+                                action: async () => {
+                                    this.$router.push('/');
+                                    await this.$store.dispatch('user/logout');
+                                    await this.$store.dispatch('note/applyIdPairs');
+                                }
                             }
-                        }
-                    ] : [
-                        {
-                            name: 'Sign Up',
-                            action: () => this.$router.push({name: "sign-up"})
-                        },
-                        {
-                            name: 'Sign In',
-                            action: () => this.$router.push({name: "sign-in"})
-                        }
-                    ]
-                },
-                {
-                    icon: lockOpenOutline,
-                    name: 'Safety',
-                    items: [
-                        {
-                            name:"test editor",
-                            action: () => this.$router.push({name: "note-create"})
-                        },
-                        {
-                            name:"item2",
-                        },
-                        {
-                            name:"item3",
-                        },
-                        {
-                            name:"item4",
-                        },
-                        {
-                            name:"item5",
-                        },
-                        {
-                            name:"item6",
-                        }
-                    ]
+                        ]
+                        : [
+                            {
+                                name: 'Sign Up',
+                                action: () => this.$router.push({name: "sign-up"})
+                            }, {
+                                name: 'Sign In',
+                                action: () => this.$router.push({name: "sign-in"})
+                            }
+                        ]
                 },
                 {
                     icon: gridOutline,
-                    name: 'Other',
-                    items: [
-                        {
-                            name:"item"
-                        }
-                    ]
+                    name: 'Settings',
+                    action: () => this.$router.push({name: "settings"})
                 }
             ];
         }

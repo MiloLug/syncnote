@@ -10,5 +10,5 @@
     }
   },
   "cordova": {},
-  "linuxAndroidStudioPath": "/usr/bin/android-studio"
+  "linuxAndroidStudioPath": "/home/liava/bin/android-studio/bin/studio.sh"
 }

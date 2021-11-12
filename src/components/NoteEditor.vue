@@ -76,7 +76,7 @@
                             ></ion-icon>
                         </button>
                     </div>
-                    <hr class="divider"/>
+                    <quartz-divider/>
                     <div class="tags">
                         <quartz-button
                             class="tag"
@@ -105,18 +105,20 @@
 import TextEditor from './TextEditor';
 import QuartzInput from './QuartzInput';
 import QuartzButton from './QuartzButton';
+import QuartzDivider from "./QuartzDivider";
 import { IonIcon } from '@ionic/vue';
 import * as icons from 'ionicons/icons';
 
 
 export default {
-    name: 'Note',
+    name: 'NoteEditor',
 
     components: {
         TextEditor,
         QuartzInput,
         IonIcon,
-        QuartzButton
+        QuartzButton,
+        QuartzDivider
     },
 
     props: {
@@ -234,11 +236,6 @@ export default {
             this.icon = iconName;
         }
     },
-
-    beforeRouteLeave() {
-        this.showIconMenu = false;
-        console.log(123213);
-    }
 }
 </script>
 
@@ -259,16 +256,6 @@ export default {
             align-items: center;
         }
 
-        .divider {
-            width: 100%;
-            background: linear-gradient(to right, var(--quartz-color-1-contrast) -30%, transparent 100%);
-            padding: 0;
-            margin-left: 0;
-            margin-bottom: 13px;
-            max-height: 2px;
-            min-height: 2px;
-        }
-
         .row-selector {
             overflow: auto;
             max-width: 100%;
@@ -281,8 +268,8 @@ export default {
             }
 
             .item {
-                min-width: 30px;
-                min-height: 30px;
+                min-width: 34px;
+                min-height: 34px;
                 background-color: var(--note-color);
                 border-radius: 50px;
                 margin: 2px 5px;
@@ -308,8 +295,9 @@ export default {
                 height: 100%;
                 top: var(--top-bar-height);
                 left: 0;
-                background: #2324268a;
+                background: rgba(0, 0, 0, 0.699);
                 z-index: 1;
+                backdrop-filter: blur(2px);
             }
 
             .content {
@@ -329,7 +317,7 @@ export default {
                 .tag {
                     height: 28px;
                     margin: 2px 2px;
-                    background: var(--quartz-color-3);
+                    background: var(--quartz-color-1);
                     color: rgba(var(--quartz-text-color-rgb), 0.5);
 
                     &.selected {
@@ -376,7 +364,7 @@ export default {
 
             ::v-deep(.input){
                 @include tools.placeholder {
-                    color: var(--quartz-color-3);
+                    color: rgba(var(--quartz-color-1-rgb), 0.6);
                 }
 
                 box-shadow: var(--quartz-shadow-2-neu-soft-contrast), var(--quartz-inner-shadow-2-neu-concave-soft-contrast);
@@ -391,18 +379,4 @@ export default {
             }
         }
     }
-</style>
-
-<style lang="scss">
-    // .keyboard-on .note-editor {
-    //     .text-editor:focus {
-    //         top: 0;
-    //         left: 0;
-    //         height: calc(100% - 100px);
-    //         width: 100%;
-    //     }
-    //     .title:not(:focus) {
-    //         display: none;
-    //     }
-    // }
 </style>

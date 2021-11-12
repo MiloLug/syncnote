@@ -3,8 +3,6 @@ import axios from 'axios';
 import store from './store';
 
 export default async function init() {
-    localization.state.setLang();
-
     axios.interceptors.response.use(undefined, async err => {
         // logout the user when they gets at least one 401
         if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
@@ -21,5 +19,8 @@ export default async function init() {
     // init the stuff
     await store.dispatch("note/sync");
     await store.dispatch("user/init");
+    
+    localization.state.setLang(store.state.user.lang);
+
     await store.dispatch("note/sync", store.state.user.isAuthenticated);
 }

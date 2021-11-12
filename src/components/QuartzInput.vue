@@ -10,6 +10,7 @@
             :style="cssVars"
             @input="onInput($event)"
             @change="onChange($event)"
+            ref="input"
         >
     </div>
 </template>
@@ -144,6 +145,16 @@ export default {
             default: ()=>"true"
         }
     },
+
+    watch: {
+        modelValue(value) {
+            if(value === this.dataValue)
+                return;
+
+            this.dataValue = pipeValue(this.format, value, this.dataValue);
+        }
+    },
+
     data: function(){
         return {
             dataValue: pipeValue(this.format, this.modelValue),
@@ -197,7 +208,7 @@ export default {
         
         .input {
             @include tools.placeholder {
-                color: var(--quartz-color-25-contrast);
+                color: rgba(var(--quartz-color-1-contrast-rgb), 0.6);
             }
 
             width: 100%;

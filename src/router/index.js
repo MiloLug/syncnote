@@ -37,6 +37,16 @@ const routes = [
         path: '/sign-in',
         component: () => import('../views/SignIn.vue'),
         name: 'sign-in'
+    },
+    {
+        path: '/reset-password',
+        component: () => import('../views/ResetPassword.vue'),
+        name: 'reset-password'
+    },
+    {
+        path: '/settings',
+        component: () => import('../views/Settings.vue'),
+        name: 'settings'
     }
 ];
 
@@ -46,10 +56,9 @@ const router = createRouter({
 });
 
 router.beforeEach(async (to, from, next) => {
-    if(
-        (to.name === 'note' || to.name === 'note-edit')
-        && (await store.state.note.initialized, !store.state.note.notes[to.params.id])
-    )
+    await store.state.note.initialized;
+
+    if((to.name === 'note' || to.name === 'note-edit') && !store.state.note.notes[to.params.id])
         next('/');
 
     // this was the only way to update it normally

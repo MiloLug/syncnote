@@ -28,6 +28,7 @@ export default {
     
     install(app) {
         app.config.globalProperties.$lang = state;
+        app.config.globalProperties.$langDictionaries = dictionaries;
     }
 };
 

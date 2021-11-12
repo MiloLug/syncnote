@@ -71,7 +71,6 @@ import {
     sortUpdatedAtDesc,
     sortTitleAsc,
     sortTitleDesc,
-    // createTagsFilter,
     createTitleFilter
 } from '../store/note';
 
@@ -161,7 +160,6 @@ export default {
     .search-bar {
         background: var(--quartz-control-panel-color);
         display: flex;
-        // background-color: var(--quartz-color-15-contrast);
         height: 70px;
         align-items: center;
         
@@ -177,6 +175,7 @@ export default {
             border-radius: 50px 0px 0px 50px;
 
             .icon {
+                color: var(--quartz-color-1);
                 font-size: 20px;
             }
         }

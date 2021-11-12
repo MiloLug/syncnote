@@ -4,7 +4,7 @@
             <form class="data-form" @submit="onSubmit">
                 <quartz-input
                     format="login"
-                    :icon="folderOpenOutline"
+                    :icon="personOutline"
                     class="input-line"
                     :placeholder="$lang.tr`Login|field` + ' *'"
                     v-model="username"
@@ -23,15 +23,23 @@
                     </quartz-button>
                 </div>
             </form>
+            <div class="links">
+                <router-link class="link" :to="{name: 'reset-password'}">
+                    {{ $lang.tr`Forgot password?` }}
+                </router-link>
+            </div>
+
+            <quartz-connection-banner/>
         </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
-import { IonPage } from '@ionic/vue';
+import { IonPage, RouterLink } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
-import { pricetagOutline, callOutline, keyOutline, mailOutline, folderOpenOutline } from 'ionicons/icons';
+import { keyOutline, personOutline } from 'ionicons/icons';
+import QuartzConnectionBanner from "../components/QuartzConnectionBanner";
 
 export default {
     name: 'SignIn',
@@ -39,14 +47,13 @@ export default {
         IonPage,
         QuartzInput,
         QuartzButton,
+        RouterLink,
+        QuartzConnectionBanner
     },
     data() {
         return {
-            pricetagOutline,
-            callOutline,
             keyOutline,
-            mailOutline,
-            folderOpenOutline,
+            personOutline,
 
             username: "",
             password: ""
@@ -64,6 +71,10 @@ export default {
                 password: this.password
             });
             await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+
+            this.username = "";
+            this.password = "";
+
             this.$router.push('/');
         }
     }
@@ -89,6 +100,17 @@ export default {
             .submit-button {
                 width: 100%;
             }
+        }
+    }
+
+    .links {
+        max-width: 100%;
+        text-align: right;
+        margin: 20px;
+        font-size: 15px;
+        
+        .link {
+            color: rgba(var(--quartz-text-color-rgb), 0.7);
         }
     }
     

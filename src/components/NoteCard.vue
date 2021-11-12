@@ -5,24 +5,26 @@
             <quartz-icon-block :icon="icon">{{ noteData?.title }}</quartz-icon-block>
         </div>
         <hr class="divider"/>
-        <div class="preview">
-            asdassadsd<br>
-            asd sad sad sadsad<br>
-            asdasdsadjdjjjj d
+        <div class="controls">
+            <quartz-button class="control">Delete</quartz-button>
+            <quartz-button class="control">Clone</quartz-button>
         </div>
     </button>
 </template>
 
 <script>
-import QuartzIconBlock from '../components/QuartzIconBlock';
+import QuartzIconBlock from './QuartzIconBlock';
+import QuartzButton from './QuartzButton';
 import * as icons from 'ionicons/icons';
 import styleProps, {applyClasses} from '../mixins/style-props.js';
 
 export default {
     name:"NoteCard",
     components: {
-        QuartzIconBlock
+        QuartzIconBlock,
+        QuartzButton
     },
+
     props: {
         ...styleProps,
         noteData: {
@@ -88,10 +90,15 @@ export default {
             word-wrap: break-word;
         }
     
-        .preview {
+        .controls {
             text-align: left;
             margin-bottom: 10px;
             line-height: 22px;
+
+            .control {
+                height: 30px;
+                margin: 10px 10px 0px 0px;
+            }
         }
         
         .divider {

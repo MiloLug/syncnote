@@ -75,13 +75,7 @@ export default {
         document.querySelector('.note-edit-content')?.scrollToTop?.(1000);
     },
 
-    beforeRouteLeave(to, from, next) {
-        console.log(2321323);
-        this.note = null;
-        next();
-    },
     beforeRouteUpdate(to, from, next) {
-        console.log(999999);
         this.note = null;
         next();
     }

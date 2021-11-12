@@ -1,15 +1,32 @@
 {
     "__lang_code__": "uk",
+    "__lang_name__": "УкраЇнська",
+
+    "Language|settings section": "Мова",
+    "Theme|settings section": "Тема",
+    "Account|settings section": "Аккаунт",
     
     "Login|field": "Логін",
     "Email": "E-mail",
     "Sign Up": "Реєстрація",
     "Sign In": "Авторизація",
+    "Send|password reset": "Відіслати запит",
+    "reset password description": "* Якщо пошти немає в списку користувачів, то ви <b>не будете про це повідомлені</b> в цілях безбеки.",
+
+    "Settings": "Налаштування",
+
     "Title|note editor field": "Заголовок",
+
     "Search|notes list field": "Шукати (заголовок)",
 
     "Updated at asc|ordering": "Спочатку старі",
     "Updated at desc|ordering": "Спочатку нові",
     "Title asc|ordering": "За заголовком (А-Я)",
-    "Title desc|ordering": "За заголовком (Я-А)"
+    "Title desc|ordering": "За заголовком (Я-А)",
+
+    "Tag|tag input field": "Тег",
+    "No tags used": "Немає використаних тегів",
+    "Add tag": "Додати тег",
+
+    "No connection": "Немає з'єднання"
 }
