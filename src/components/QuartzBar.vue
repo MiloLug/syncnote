@@ -40,13 +40,13 @@
 <script>
 import { IonIcon } from '@ionic/vue';
 
-function validateEntry(entry, requiredIcon=true) {
+function entryIsInvalid(entry, requiredIcon=true) {
     return (
         !entry.name  // each entry has to have a name
         || (requiredIcon && !entry.icon)  // and icon (optional)
         || (!entry.action && !entry.items)  // also, action or sub-entries
         || (entry.items && entry.items.some(
-                item => !validateEntry(item, false)
+                item => entryIsInvalid(item, false)
             ))  // end all of the above for the sub-entries
     );
 }
@@ -63,7 +63,7 @@ export default {
             required: true,
             validator: content => {
                 for(const entry of content){
-                    if(!validateEntry(entry)) return false;
+                    if(entryIsInvalid(entry)) return false;
                 }
                 return true;
             }

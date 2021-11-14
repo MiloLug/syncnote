@@ -38,7 +38,7 @@ export const sortTitleDesc = notes =>
 
 export const createTagsFilter = filterTags => state => noteId => {
     for(const tagName of filterTags) {
-        if(!state.tags[tagName][noteId])
+        if(!state.tags[tagName]?.[noteId])
             return false;
     }
     return true;
@@ -134,6 +134,12 @@ export default {
                 (a, b) => tmpTags[a].__count__ < tmpTags[b].__count__
             );
             state.tags = tmpTags;
+
+            let notesIds = state.orderedNotes;
+            for(const fn of state.filteringFunctions){
+                notesIds = notesIds.filter(fn);
+            }
+            state.filteredNotes = notesIds;
         },
 
         notesOrderingUpdate(state) {
@@ -164,7 +170,7 @@ export default {
             // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(notes);
             for(const id of orderedIds){
-                const size = notes[id];
+                const size = notes[id].dataSize;
                 state.dataSize += size;
 
                 if(state.dataSizeLimit !== -1 && state.dataSize > state.dataSizeLimit)
@@ -231,6 +237,9 @@ export default {
         addNotesToSend(state, ids=[]) {
             for(const id of ids) state.notesToSend[id] = 1;
         },
+        addNotesToSave(state, ids=[]) {
+            for(const id of ids) state.notesToSave[id] = 1;
+        },
 
         dataSizeLimitUpdate(state, limit=-1) {
             state.dataSizeLimit = limit;
@@ -242,7 +251,7 @@ export default {
             const orderedIds = sortUpdatedAtAsc(state.notes);
             let dataSize = 0;
             for(const id of orderedIds){
-                const size = state.notes[id];
+                const size = state.notes[id].dataSize;
                 dataSize += size;
 
                 if(limit !== -1 && dataSize > limit)
@@ -271,6 +280,7 @@ export default {
             window.noteStorage = noteStorage;
 
             const tmpList = {};
+            const notesToSave = [];
             await noteStorage.forEach((value, key) => {
                 tmpList[key] = value;
             });
@@ -297,7 +307,8 @@ export default {
                             icon: note.icon ?? null,
                             dataSize: note.data_size ?? (note.content ?? "").length,
                             updatedAt: new Date(note.updated_at).getTime()
-                        }
+                        };
+                        notesToSave.push(note.id);
                     }
 
                     commit('collectSuccess');
@@ -308,6 +319,7 @@ export default {
             }
 
             commit('newNotes', tmpList);
+            commit('addNotesToSave', notesToSave);
             commit('notesOrderingUpdate');
             commit('tagsUpdate');
             
@@ -339,7 +351,7 @@ export default {
         },
 
         async saveRemoteNotes({ state, commit }) {
-            const toSave = Object.keys(state.notesToSend);
+            const toSave = Object.keys(state.notesToSend).filter(id => !state.oversizedNotes[id]);
             commit('cleanSendingQueue');
 
             if(!toSave.length) return;
@@ -376,12 +388,13 @@ export default {
             await dispatch('collectNotes', useServer);
             if(useServer) {
                 await dispatch('saveRemoteNotes');
-                await dispatch('saveLocalNotes');
             }
+            await dispatch('saveLocalNotes');
         },
 
         async applyIdPairs({ dispatch, commit }) {
             await dispatch('saveLocalNotes');
+            commit('cleanSendingQueue');
             commit('cleanIdPairs');
             await dispatch('collectNotes');
         },

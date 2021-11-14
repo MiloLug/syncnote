@@ -32,6 +32,46 @@
             </div>
             <div class="settings-block" v-if="$store.state.user.isAuthenticated">
                 <div class="title">{{ $lang.tr`Account|settings section` }}</div>
+                <form class="data-form" @submit="onAccountFormSubmit">
+                    <quartz-input
+                        format="login"
+                        :icon="personOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`Login|field` + ' *'"
+                        v-model="newUsername"
+                    />
+                    <quartz-input
+                        format="email"
+                        :icon="mailOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`Email`"
+                        v-model="newEmail"
+                    />
+                    <quartz-divider/>
+                    <quartz-input
+                        format="password"
+                        :icon="keyOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`Old Password`"
+                        v-model="oldPassword"
+                    />
+                    <quartz-input
+                        format="password"
+                        :icon="keyOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`New Password`"
+                        v-model="newPassword"
+                    />
+                    
+                    <div class="input-line controls">
+                        <quartz-button type="submit" class="submit-button" shadow="center">
+                            {{ $lang.tr`Save` }}
+                        </quartz-button>
+                    </div>
+                </form>
+                <div class="description" v-html="$lang.tr`account settings description`"></div>
+
+                <quartz-connection-banner/>
             </div>
         </ion-content>
     </ion-page>
@@ -40,6 +80,10 @@
 <script lang="js">
 import { IonContent, IonPage, IonSelect, IonSelectOption } from '@ionic/vue';
 import QuartzButton from "../components/QuartzButton";
+import QuartzDivider from "../components/QuartzDivider";
+import QuartzInput from "../components/QuartzInput";
+import QuartzConnectionBanner from "../components/QuartzConnectionBanner";
+import { keyOutline, mailOutline, personOutline } from 'ionicons/icons';
 
 
 export default {
@@ -50,7 +94,10 @@ export default {
         IonPage,
         QuartzButton,
         IonSelect,
-        IonSelectOption
+        IonSelectOption,
+        QuartzDivider,
+        QuartzInput,
+        QuartzConnectionBanner
     },
 
     computed: {
@@ -62,11 +109,26 @@ export default {
                 this.$lang.setLang(value);
                 this.$store.dispatch('user/setLang', value);
             }
-        }
+        },
+        username() { return this.$store.state.user.username; },
+        email() { return this.$store.state.user.email; }
+    },
+
+    watch: {
+        username(value) { this.newUsername = value; },
+        email(value) { this.newEmail = value; }
     },
 
     data() {
         return {
+            keyOutline,
+            mailOutline,
+            personOutline,
+
+            newUsername: this.$store.state.user.username,
+            newEmail: this.$store.state.user.email,
+            oldPassword: "",
+            newPassword: ""
         };
     },
 
@@ -74,6 +136,28 @@ export default {
         onBtnThemeClick(theme) {
             this.$store.dispatch('user/setTheme', theme);
         },
+
+        onAccountFormSubmit(e) {
+            e.preventDefault();
+            this.updateAccount();
+            return false;
+        },
+        async updateAccount() {
+            const data = {
+                email: this.newEmail,
+                username: this.newUsername
+            };
+            if(this.newPassword)
+                data.newPassword = this.newPassword,
+                data.oldPassword = this.oldPassword;
+
+            console.log(data);
+
+            await this.$store.dispatch('user/updateUserData', data);
+
+            this.oldPassword = "";
+            this.newPassword = "";
+        }
     },
 }
 </script>
@@ -83,9 +167,11 @@ export default {
 
     .settings-block {
         background: rgba(var(--quartz-color-4-rgb), 0.5);
-        padding: 1.5px 7px 8px 17.5px;
+        padding: 1.5px 17.5px 8px 17.5px;
         border-radius: 10px;
         margin: 13.5px;
+        overflow: hidden;
+        position: relative;
 
         > .title {
             margin: 10px 0px;
@@ -96,8 +182,35 @@ export default {
         }
     }
 
-    .divider {
-        margin: 24px 0px;
+    .data-form {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-top: 40px;
+    }
+
+    .input-line {
+        margin: 14px 0px;
+        width: calc(100% - 40px);
+        
+        &.controls {
+            text-align: right;
+            margin-top: 40px;
+
+            .submit-button {
+                width: 100%;
+            }
+        }
+    }
+
+    .description {
+        margin: 20px;
+        margin-top: 60px;
+        font-size: 12px;
+        background: rgba(var(--quartz-color-4-rgb), 0.5);
+        padding: 21px;
+        border-radius: 10px;
+        color: rgba(var(--quartz-text-color-rgb), 0.8);
     }
 
     .row-selector {

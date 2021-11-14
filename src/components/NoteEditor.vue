@@ -262,6 +262,7 @@ export default {
             position: relative;
             display: flex;
             margin: 2px 0px;
+            min-height: 38px;
 
             &.icons .item {
                 border: 1px solid var(--quartz-color-4-contrast);
@@ -315,10 +316,15 @@ export default {
                 padding: 5px;
 
                 .tag {
-                    height: 28px;
                     margin: 2px 2px;
                     background: var(--quartz-color-1);
                     color: rgba(var(--quartz-text-color-rgb), 0.5);
+                    height: auto;
+                    min-height: 28px;
+                    display: inline-block;
+                    word-break: break-word;
+                    word-wrap: break-word;
+                    padding: 6px 20.5px;
 
                     &.selected {
                         background: var(--quartz-color-15-contrast);

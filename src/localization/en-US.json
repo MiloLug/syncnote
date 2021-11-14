@@ -12,6 +12,7 @@
     "Sign In": "Sign In",
     "Send|password reset": "Send request",
     "reset password description": "* If the address is not in the user list, you will <b>not be notified</b> for security purposes.",
+    "account settings description": "* You <b>can remove your email</b> from the account.",
 
     "Settings": "Settings",
 
@@ -28,5 +29,6 @@
     "No tags used": "No tags used",
     "Add tag": "Add tag",
 
-    "No connection": "No connection"
+    "No connection": "No connection",
+    "Cant be syncronized": "Cant be syncronized"
 }

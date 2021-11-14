@@ -1,5 +1,5 @@
 {
-  "appId": "io.ionic.starter",
+  "appId": "com.quartzvision.syncnote",
   "appName": "Syncnote",
   "bundledWebRuntime": false,
   "npmClient": "npm",

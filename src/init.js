@@ -5,7 +5,7 @@ import store from './store';
 export default async function init() {
     axios.interceptors.response.use(undefined, async err => {
         // logout the user when they gets at least one 401
-        if (err.status === 401 && err.config && !err.config.__isRetryRequest) {
+        if (err.response?.status === 401 && err.config && !err.config.__isRetryRequest) {
             store.dispatch('user/logout');
         }
         throw err;

@@ -68,11 +68,15 @@ export default {
 
 <style lang="scss" scoped>
     .banner {
-        position: fixed;        
+        position: absolute;        
         z-index: 999999;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
 
         .bg {
-            position: fixed;
+            position: absolute;
             width: 100%;
             height: 100%;
             left: 0;
@@ -83,7 +87,7 @@ export default {
         }
 
         .content {
-            position: fixed;
+            position: absolute;
             background: var(--quartz-color-25);
             z-index: 2;
             width: calc(100% - 50px);

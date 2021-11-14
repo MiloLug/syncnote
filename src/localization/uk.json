@@ -12,6 +12,7 @@
     "Sign In": "Авторизація",
     "Send|password reset": "Відіслати запит",
     "reset password description": "* Якщо пошти немає в списку користувачів, то ви <b>не будете про це повідомлені</b> в цілях безбеки.",
+    "account settings description": "* Ви можете взагалі <b>прибрати e-mail</b> з аккаунта.",
 
     "Settings": "Налаштування",
 
@@ -28,5 +29,6 @@
     "No tags used": "Немає використаних тегів",
     "Add tag": "Додати тег",
 
-    "No connection": "Немає з'єднання"
+    "No connection": "Немає з'єднання",
+    "Cant be syncronized": "Неможливо синхронізувати"
 }

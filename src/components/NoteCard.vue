@@ -9,6 +9,9 @@
             <quartz-button class="control">Delete</quartz-button>
             <quartz-button class="control">Clone</quartz-button>
         </div>
+        <div class="warning" v-if="$store.state.note.oversizedNotes[noteData.id]">
+            {{ $lang.tr`Cant be syncronized` }}
+        </div>
     </button>
 </template>
 
@@ -113,6 +116,11 @@ export default {
         .info {
             font-size: 11px;
             text-align: right;
+        }
+
+        .warning {
+            font-size: 13px;
+            margin: 13px 0px 0px 0px;
         }
     }
 </style>

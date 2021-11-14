@@ -9,7 +9,15 @@
                     :placeholder="$lang.tr`Search|notes list field`"
                     shadow="2-neu-soft-contrast"
                 />
-                <quartz-button class="btn-order" @click="onBtnOrderClick">
+                <quartz-button class="menu-btn filter-tags" @click="onBtnFilterTagsClick">
+                    <ion-icon
+                        class="icon"
+                        :ios="pricetagOutline"
+                        :md="pricetagOutline"
+                        type="button"
+                    ></ion-icon>
+                </quartz-button>
+                <quartz-button class="menu-btn order" @click="onBtnOrderClick">
                     <ion-icon
                         class="icon"
                         :ios="swapVertical"
@@ -24,7 +32,7 @@
                     <note-card
                         v-quartz:long-tap="onLongTap"
                         class="note-card"
-                        v-for="id in $store.state.note.filteredNotes"
+                        v-for="id in noteIds"
                         @click="onCardClick(id)"
                         :key="$store.state.note.notes[id]"
                         :note-data="$store.state.note.notes[id]"
@@ -41,29 +49,49 @@
                     <ion-icon :icon="add" class="icon"/>
                 </ion-fab-button>
             </ion-fab>
-        </ion-content>
 
-        <div class="ordering-menu" v-if="showOrderingMenu">
-            <div class="menu-bg" @click="onOrderingMenuBgClick"></div>
+            <div class="menu ordering" v-if="showOrderingMenu">
+                <div class="bg" @click="onMenuBgClick"></div>
 
-            <div class="content">
-                <quartz-button
-                    class="ordering-entry"
-                    v-for="ordering in orderings"
-                    @click="onOrderingEntryClick(ordering)"
-                    :class="{selected: ordering.fn === $store.state.note.orderingFunction}"
-                    :key="ordering"
-                >
-                    {{ $lang.tr(ordering.name) }}
-                </quartz-button>
+                <div class="content">
+                    <quartz-button
+                        class="entry"
+                        v-for="ordering in orderings"
+                        @click="onOrderingEntryClick(ordering)"
+                        :class="{selected: ordering.fn === $store.state.note.orderingFunction}"
+                        :key="ordering"
+                        shadow="center"
+                    >
+                        {{ $lang.tr(ordering.name) }}
+                    </quartz-button>
+                </div>
             </div>
-        </div>
+
+            <div class="menu tag-filtering" v-if="showTagsMenu">
+                <div class="bg" @click="onMenuBgClick"></div>
+
+                <div class="content">
+                    <quartz-button
+                        class="tag"
+                        v-for="tagName in tagList"
+                        :key="tagName"
+                        :class="{selected: tagsSelected[tagName]}"
+                        @click="onBtnTagClick(tagName)"
+                    >
+                        {{ tagName }}
+                    </quartz-button>
+                    <p class="no-tags" v-if="!tagList.length">
+                        {{ $lang.tr`No tags used` }}
+                    </p>
+                </div>
+            </div>
+        </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
 import { IonPage, IonContent, IonFab, IonFabButton, IonIcon } from '@ionic/vue';
-import { add, swapVertical } from 'ionicons/icons';
+import { add, swapVertical, pricetagOutline } from 'ionicons/icons';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import {
@@ -71,7 +99,8 @@ import {
     sortUpdatedAtDesc,
     sortTitleAsc,
     sortTitleDesc,
-    createTitleFilter
+    createTitleFilter,
+    createTagsFilter
 } from '../store/note';
 
 import NoteCard from '../components/NoteCard';
@@ -90,10 +119,45 @@ export default {
         QuartzButton
     },
 
+    computed: {
+        noteIds() {
+            return this.$store.state.note.filteredNotes.filter(
+                id => this.$store.state.note.notes[id]
+            );
+        },
+        storeTags() {
+            return this.$store.state.note.orderedTagNames;
+        },
+        tagList() {
+            const used = [];
+            const others = [];
+
+            for(const tagName of this.$store.state.note.orderedTagNames)
+                (this.tagsSelected[tagName] ? used : others).push(tagName);
+
+            return [...used, ...others];
+        }
+    },
+
     watch: {
         searchString(value) {
             this.filters.search = value ? createTitleFilter(value) : null;
             this.updateFiltering();
+        },
+        tagsSelected(value) {
+            const tags = Object.getOwnPropertyNames(value);
+            
+            this.filters.tags = tags.length ? createTagsFilter(tags) : null;
+            this.updateFiltering();
+        },
+        storeTags(value) {
+            let update = false;
+            for(const tag of Object.getOwnPropertyNames(this.tagsSelected)) {
+                if((update = !this.$store.state.note.tags[tag]))
+                    delete this.tagsSelected[tag];
+            }
+            if(update)
+                this.tagsSelected = {...this.tagsSelected};
         }
     },
 
@@ -101,8 +165,10 @@ export default {
         return {
             add,
             swapVertical,
+            pricetagOutline,
 
             showOrderingMenu: false,
+            showTagsMenu: false,
             orderings: [
                 {name: 'Updated at asc|ordering', fn: sortUpdatedAtAsc},
                 {name: 'Updated at desc|ordering', fn: sortUpdatedAtDesc},
@@ -115,7 +181,7 @@ export default {
                 tags: null
             },
             searchString: "",
-            tagsSeelcted: {}
+            tagsSelected: {}
         };
     },
 
@@ -130,12 +196,24 @@ export default {
         onBtnOrderClick() {
             this.showOrderingMenu = true;
         },
-        onOrderingMenuBgClick() {
+        onMenuBgClick() {
             this.showOrderingMenu = false;
+            this.showTagsMenu = false;
         },
         onOrderingEntryClick(ordering) {
             this.$store.commit('note/newOrdering', ordering.fn);
             this.showOrderingMenu = false;
+        },
+
+        onBtnFilterTagsClick() {
+            this.showTagsMenu = !this.showTagsMenu;
+        },
+        onBtnTagClick(tagName) {
+            if(this.tagsSelected[tagName])
+                delete this.tagsSelected[tagName],
+                this.tagsSelected = {...this.tagsSelected};
+            else
+                this.tagsSelected = {...this.tagsSelected, [tagName]: true};
         },
 
         updateFiltering() {
@@ -168,50 +246,83 @@ export default {
             width: 100%;
         }
 
-        .btn-order {
+        .menu-btn {
             min-width: 50px;
             height: 50px;
             padding: 0;
-            border-radius: 50px 0px 0px 50px;
+            
+            &.order {
+                border-radius: 50px 0px 0px 50px;
+                margin-left: 8px;
+            }
 
             .icon {
-                color: var(--quartz-color-1);
+                color: var(--quartz-text-color-contrast);
                 font-size: 20px;
             }
         }
     }
 
-    .ordering-menu {
+    .menu {
         position: fixed;        
         z-index: 999999;
 
-        .menu-bg {
+        .bg {
             position: fixed;
             width: 100%;
             height: 100%;
             top: 0;
             left: 0;
-            background: #2324268a;
+            background: rgba(0, 0, 0, 0.699);
             z-index: 1;
+            backdrop-filter: blur(2px);
         }
 
         .content {
             position: fixed;
             display: inline-flex;
             flex-direction: column;
-            background: white;
+            background: var(--quartz-color-25);
             z-index: 2;
             width: 80%;
             min-height: 100px;
             top: 100px;
+            border-radius: 5px;
             left: 10%;
+            padding: 10px;
         }
 
-        .ordering-entry{
-            margin: 5px;
+        &.ordering .entry{
+            margin: 10px 5px;
 
             &.selected {
-                border: 4px solid blue;
+                background: var(--quartz-color-15);
+                box-shadow: none;
+            }
+        }
+
+        &.tag-filtering {
+            .content {
+                display: block;
+                overflow: auto;
+                max-height: calc(100% - 168px);
+
+                .tag {
+                    margin: 2px 2px;
+                    background: var(--quartz-color-1);
+                    color: rgba(var(--quartz-text-color-rgb), 0.5);
+                    height: auto;
+                    min-height: 28px;
+                    display: inline-block;
+                    word-break: break-word;
+                    word-wrap: break-word;
+                    padding: 6px 20.5px;
+
+                    &.selected {
+                        background: var(--quartz-color-15-contrast);
+                        color: var(--quartz-color-1);
+                    }
+                }
             }
         }
     }

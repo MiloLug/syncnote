@@ -37,7 +37,7 @@
 </template>
 
 <script lang="js">
-import { IonPage } from '@ionic/vue';
+import { IonPage, IonContent } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import { keyOutline, mailOutline, personOutline } from 'ionicons/icons';
@@ -49,7 +49,8 @@ export default {
         IonPage,
         QuartzInput,
         QuartzButton,
-        QuartzConnectionBanner
+        QuartzConnectionBanner,
+        IonContent
     },
     data() {
         return {
@@ -69,12 +70,16 @@ export default {
             return false;
         },
         async signUp() {
+            await this.$store.dispatch("note/applyIdPairs");
+
             await this.$store.dispatch('user/startRegister', {
                 username: this.username,
                 email: this.email || null,
                 password: this.password
             });
+
             await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+            
             this.$router.push('/');
 
             this.username = "";

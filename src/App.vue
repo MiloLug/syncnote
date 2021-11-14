@@ -64,8 +64,8 @@ export default {
                                 name: 'Log Out',
                                 action: async () => {
                                     this.$router.push('/');
-                                    await this.$store.dispatch('user/logout');
                                     await this.$store.dispatch('note/applyIdPairs');
+                                    await this.$store.dispatch('user/logout');
                                 }
                             }
                         ]
@@ -105,6 +105,8 @@ export default {
             await this.saveLocalNotes();
             setTimeout(loop, 5000);
         };
+
+        window.gg = this.$store;
     },
     methods: {
         // openScanner: async function(){

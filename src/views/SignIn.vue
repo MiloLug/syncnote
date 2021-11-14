@@ -66,16 +66,21 @@ export default {
             return false;
         },
         async signIn() {
+            await this.$store.dispatch("note/applyIdPairs");
+
             await this.$store.dispatch('user/startAuth', {
                 username: this.username,
                 password: this.password
             });
+            
             await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
 
-            this.username = "";
-            this.password = "";
+            if(this.$store.state.user.isAuthenticated){
+                this.username = "";
+                this.password = "";
 
-            this.$router.push('/');
+                this.$router.push('/');
+            }
         }
     }
 }
