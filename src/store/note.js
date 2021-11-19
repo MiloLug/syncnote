@@ -11,8 +11,10 @@ export const UPLOAD_START = 4;
 export const UPLOAD_SUCCESS = 5;
 export const UPLOAD_ERROR = 6;
 
-export const GET_UPDATES_URL = `${BASE_URL}/notes/get-updates/`;
-export const SEND_UPDATES_URL = `${BASE_URL}/notes/send-updates/`;
+export const NOTES_GENERAL_URL = `${BASE_URL}/notes`;
+export const GET_UPDATES_URL = `${NOTES_GENERAL_URL}/get-updates/`;
+export const SEND_UPDATES_URL = `${NOTES_GENERAL_URL}/send-updates/`;
+
 
 
 // notes sorting functions:
@@ -143,7 +145,18 @@ export default {
         },
 
         notesOrderingUpdate(state) {
-            let notesIds = state.orderedNotes = state.orderingFunction(state.notes);
+            let notesIds = state.orderingFunction(state.notes);
+            const newLen = notesIds.length;
+            
+            if(newLen === state.orderedNotes.length) {
+                let i = 0;
+                for(; i < newLen && notesIds[i] === state.orderedNotes[i]; i++);
+                if(i === newLen){
+                    return;
+                }
+            }
+
+            state.orderedNotes = notesIds;
 
             for(const fn of state.filteringFunctions){
                 notesIds = notesIds.filter(fn);
@@ -173,7 +186,7 @@ export default {
                 const size = notes[id].dataSize;
                 state.dataSize += size;
 
-                if(state.dataSizeLimit !== -1 && state.dataSize > state.dataSizeLimit)
+                if(state.dataSizeLimit !== -1 && (state.dataSize - state.oversizedNotesSize) > state.dataSizeLimit)
                     state.oversizedNotes[id] = 1,
                     state.oversizedNotesSize += size;
             }
@@ -207,7 +220,7 @@ export default {
                         delete state.oversizedNotes[id];
                     }
 
-                    if(note.dataSize > realSizeRemain){
+                    if(newSize > realSizeRemain){
                         state.oversizedNotes[id] = 1;
                         state.oversizedNotesSize += newSize;
                     }
@@ -225,13 +238,39 @@ export default {
             state.notesToSend[id] = 1;
         },
 
+        deleteNote(state, noteId) {
+            // no dataSize = no size update
+            const note = state.notes[noteId];
+            if(!note) return;
+
+            delete state.notes[noteId];
+
+            if(note.dataSize !== undefined){
+                if(state.dataSizeLimit !== -1 && state.oversizedNotes[noteId]){
+                    state.oversizedNotesSize -= note.dataSize;
+                    delete state.oversizedNotes[noteId];
+                }
+
+                state.dataSize -= note.dataSize;
+            }
+
+            delete state.notesToSave[noteId];
+            delete state.notesToSend[noteId];
+
+            const remoteId = state.localRemoteIds[noteId];
+            if(remoteId) {
+                delete state.localRemoteIds[noteId];
+                delete state.remoteLocalIds[remoteId];
+            }
+        },
+
         cleanSavingQueue(state, id=null) {
-            if(id) state.notesToSave = {};
-            else delete state.notesToSave[id];
+            if(id) delete state.notesToSave[id];
+            else state.notesToSave = {};
         },
         cleanSendingQueue(state, id=null) {
-            if(id) state.notesToSend = {};
-            else delete state.notesToSend[id];
+            if(id) delete state.notesToSend[id];
+            else state.notesToSend = {};
         },
 
         addNotesToSend(state, ids=[]) {
@@ -261,14 +300,21 @@ export default {
         },
 
         addIdPair(state, {local, remote}) {
-            if(!state.localRemoteIds[local])
-                state.notesToSave[local] = 1;
+            state.notesToSave[local] = 1;
 
             state.localRemoteIds[local] = remote;
             state.remoteLocalIds[remote] = local;
         },
 
-        cleanIdPairs(state) {
+        cleanIdPairs(state, localId) {
+            if(localId) {
+                const remoteId = state.localRemoteIds[localId];
+                if(remoteId) {
+                    delete state.localRemoteIds[localId];
+                    delete state.remoteLocalIds[remoteId];
+                }
+                return;
+            }
             state.localRemoteIds = {};
             state.remoteLocalIds = {};
         }
@@ -393,36 +439,43 @@ export default {
         },
 
         async applyIdPairs({ dispatch, commit }) {
-            await dispatch('saveLocalNotes');
             commit('cleanSendingQueue');
+            await dispatch('saveLocalNotes');
             commit('cleanIdPairs');
             await dispatch('collectNotes');
         },
 
         async addNote({ commit }, note) {
-            commit('newNote', {
+            note = {
                 ...note,
+                tags: [...(note.tags ?? [])],
                 updatedAt: Date.now(),
                 dataSize: note.content.length
-            });
+            };
+            commit('newNote', note);
             commit('notesOrderingUpdate');
 
-            if(note.tags !== undefined && note.tags.length)
+            if(note.tags.length)
                 commit('tagsUpdate');
         },
-
         async updateNote({ state, commit }, note) {
             const oldNote = state.notes[note.id];
             let updateOrdering = false;
             let updateTags = false;
 
             // update the ordering only when it's needed
-            if(
-                state.orderingFunction === sortUpdatedAtDesc
-                || state.orderingFunction === sortUpdatedAtAsc
-                || note?.title !== oldNote.title
-            )
-                updateOrdering = true;
+            switch(state.orderingFunction) {
+                case sortUpdatedAtDesc:
+                    updateOrdering = state.orderedNotes[0] !== note.id;
+                    break;
+                case sortUpdatedAtAsc:
+                    updateOrdering = state.orderedNotes[state.orderedNotes.length - 1] !== note.id;
+                    break;
+                case sortTitleAsc:
+                case sortTitleDesc:
+                    updateOrdering = note?.title !== oldNote.title;
+                    break;
+            }
             
             // also don't update tags if they wasn't changed
             if(
@@ -443,6 +496,30 @@ export default {
 
             updateOrdering && commit('notesOrderingUpdate');
             updateTags && commit('tagsUpdate');
+        },
+        async deleteNote({ state, commit }, noteId) {
+            const noteStorage = await NoteStorage;
+            const remoteId = state.localRemoteIds[noteId] ?? noteId;
+
+            await noteStorage.remove(noteId);
+            commit('deleteNote', noteId);
+            commit('notesOrderingUpdate');
+            commit('tagsUpdate');
+
+            try {
+                await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
+            }
+            catch(e) {
+                // todo
+            }
+        },
+        async cloneNote({ state, dispatch }, noteId) {
+            const note = state.notes[noteId];
+            await dispatch('addNote', {
+                ...note,
+                id: Math.random().toString(16).slice(2),
+                title: (note.title ?? '') + '++'
+            });
         },
 
         async commitNote({ state, dispatch }, note) {

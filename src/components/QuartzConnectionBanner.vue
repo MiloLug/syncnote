@@ -92,7 +92,7 @@ export default {
             z-index: 2;
             width: calc(100% - 50px);
             height: 100px;
-            top: calc(50% - 100px);
+            top: calc(50% - 50px);
             border-radius: 5px;
             left: 25px;
             padding: 10px;

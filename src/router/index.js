@@ -58,16 +58,28 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
     await store.state.note.initialized;
 
-    if((to.name === 'note' || to.name === 'note-edit') && !store.state.note.notes[to.params.id])
-        next('/');
-
-    // this was the only way to update it normally
-    else if(to.name === 'note-create')
-        to.params.createId = Math.random().toString(16).slice(2),
-        next();
-
-    else
-        next();
+    switch(to.name) {
+        case 'note':
+        case 'note-edit':
+            if(!store.state.note.notes[to.params.id]) {
+                store.commit('unsetEditing');
+                next('/');
+            }
+            else {
+                store.commit('setEditing');
+                next();
+            }
+            break;
+        // this was the only way to update it normally
+        case 'note-create':
+            to.params.createId = Math.random().toString(16).slice(2);
+            store.commit('setEditing');
+            next();
+            break;
+        default:
+            store.commit('unsetEditing');
+            next();
+    }
 });
 
 export default router;

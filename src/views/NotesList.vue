@@ -27,13 +27,12 @@
                 </quartz-button>
             </div>
 
-            <div class="notes-list-wrapper">
-                <div class="notes-list" :key="$store.state.note.filteredNotes">
+            <div class="notes-list-wrapper" v-if="!$store.state.editing">
+                <div class="notes-list">
                     <note-card
                         v-quartz:long-tap="onLongTap"
                         class="note-card"
                         v-for="id in noteIds"
-                        @click="onCardClick(id)"
                         :key="$store.state.note.notes[id]"
                         :note-data="$store.state.note.notes[id]"
                     ></note-card>
@@ -146,11 +145,11 @@ export default {
         },
         tagsSelected(value) {
             const tags = Object.getOwnPropertyNames(value);
-            
+
             this.filters.tags = tags.length ? createTagsFilter(tags) : null;
             this.updateFiltering();
         },
-        storeTags(value) {
+        storeTags() {
             let update = false;
             for(const tag of Object.getOwnPropertyNames(this.tagsSelected)) {
                 if((update = !this.$store.state.note.tags[tag]))
@@ -186,9 +185,6 @@ export default {
     },
 
     methods: {
-        onCardClick(id) {
-            this.$router.push({name: "note", params: {id}});
-        },
         onBtnAddClick() {
             this.$router.push({name: "note-create"});
         },

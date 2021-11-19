@@ -13,7 +13,6 @@
   "dependencies": {
     "@capacitor/android": "^2.4.7",
     "@capacitor/core": "2.4.7",
-    "@ionic-native/barcode-scanner": "^5.32.0",
     "@ionic-native/core": "^5.32.0",
     "@ionic-native/network": "^5.36.0",
     "@ionic/storage": "^3.0.6",
@@ -29,7 +28,6 @@
     "core-js": "^3.6.5",
     "dart-sass": "^1.25.0",
     "localforage-cordovasqlitedriver": "^1.8.0",
-    "phonegap-plugin-barcodescanner": "^8.1.0",
     "sass": "^1.38.0",
     "scss": "^0.2.4",
     "style-loader": "^2.0.0",

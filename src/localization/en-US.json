@@ -5,6 +5,7 @@
     "Language|settings section": "Language",
     "Theme|settings section": "Theme",
     "Account|settings section": "Account",
+    "Dangerous|settings section": "Danger zone",
 
     "Login|field": "Login",
     "Email": "Email",
@@ -30,5 +31,16 @@
     "Add tag": "Add tag",
 
     "No connection": "No connection",
-    "Cant be syncronized": "Cant be syncronized"
+    "Cant be syncronized": "Cant be syncronized",
+
+    "Delete": "Delete",
+    "Clone": "Clone",
+
+    "Old password": "Old password",
+    "New password": "New password",
+    "Save": "Save",
+
+    "Remove account": "Remove account",
+    "account deleteion confirmation": "If you really want to DELETE tour account, then write 'delete'",
+    "account deleteion confirmation response": "delete"
 }

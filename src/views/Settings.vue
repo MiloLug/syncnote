@@ -52,14 +52,14 @@
                         format="password"
                         :icon="keyOutline"
                         class="input-line"
-                        :placeholder="$lang.tr`Old Password`"
+                        :placeholder="$lang.tr`Old password`"
                         v-model="oldPassword"
                     />
                     <quartz-input
                         format="password"
                         :icon="keyOutline"
                         class="input-line"
-                        :placeholder="$lang.tr`New Password`"
+                        :placeholder="$lang.tr`New password`"
                         v-model="newPassword"
                     />
                     
@@ -70,6 +70,17 @@
                     </div>
                 </form>
                 <div class="description" v-html="$lang.tr`account settings description`"></div>
+
+                <quartz-connection-banner/>
+            </div>
+
+            <div class="settings-block" v-if="$store.state.user.isAuthenticated">
+                <div class="title">{{ $lang.tr`Dangerous|settings section` }}</div>
+                <div class="input-line controls">
+                    <quartz-button class="submit-button delete-user" shadow="center" @click="onBtnDeleteUserClick">
+                        {{ $lang.tr`Remove account` }}
+                    </quartz-button>
+                </div>
 
                 <quartz-connection-banner/>
             </div>
@@ -157,6 +168,13 @@ export default {
 
             this.oldPassword = "";
             this.newPassword = "";
+        },
+
+        async onBtnDeleteUserClick() {
+            if(prompt(this.$lang.tr`account deleteion confirmation`) === this.$lang.tr`account deleteion confirmation response`) {
+                await this.$store.dispatch('note/applyIdPairs');
+                await this.$store.dispatch('user/deleteAccount');
+            }
         }
     },
 }
@@ -190,7 +208,7 @@ export default {
     }
 
     .input-line {
-        margin: 14px 0px;
+        margin: 14px auto;
         width: calc(100% - 40px);
         
         &.controls {
@@ -199,13 +217,17 @@ export default {
 
             .submit-button {
                 width: 100%;
+
+                &.delete-user {
+                    background: rgba(var(--ion-color-danger-rgb), .5);
+                }
             }
         }
     }
 
     .description {
         margin: 20px;
-        margin-top: 60px;
+        margin-top: 40px;
         font-size: 12px;
         background: rgba(var(--quartz-color-4-rgb), 0.5);
         padding: 21px;

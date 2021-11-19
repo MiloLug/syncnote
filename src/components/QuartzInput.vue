@@ -99,7 +99,8 @@ function pipeValue(format, ...args) {
 const fieldTypeFormatting = {
     phone: "phone",
     password: "password",
-    email: "email"
+    email: "email",
+    login: "login"
 };
 
 export default {

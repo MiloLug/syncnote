@@ -187,6 +187,15 @@ export default {
                 // todo
             }
         },
+        async deleteAccount({ dispatch }) {
+            try {
+                await axios.delete(PROFILE_URL);
+                await dispatch('logout');
+            }
+            catch(e) {
+                // todo
+            }
+        },
 
         async updateStorage({state}) {
             const userStorage = await UserStorage;

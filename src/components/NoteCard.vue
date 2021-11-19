@@ -1,23 +1,32 @@
 <template>
-    <button class="card" :style="cssVars" :class="mainClasses">
-        <div class="info">{{ new Date(noteData?.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
-        <div class="title">
-            <quartz-icon-block :icon="icon">{{ noteData?.title }}</quartz-icon-block>
-        </div>
-        <hr class="divider"/>
+    <div class="card" :class="{'has-warning': $store.state.note.oversizedNotes[noteData.id]}">
+        <button
+            :style="cssVars"
+            :class="[mainClasses]"
+            class="content"
+            @click="onCardClick"
+        >
+            <div class="info">{{ new Date(noteData?.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
+            <div class="title">
+                <quartz-icon-block :icon="icon">{{ noteData?.title }}</quartz-icon-block>
+            </div>
+            <quartz-divider class="divider"/>
+            <div class="warning" v-if="$store.state.note.oversizedNotes[noteData.id]">
+                {{ $lang.tr`Cant be syncronized` }}
+            </div>
+        </button>
+
         <div class="controls">
-            <quartz-button class="control">Delete</quartz-button>
-            <quartz-button class="control">Clone</quartz-button>
+            <quartz-button class="control" @click="onBtnDeleteClick">{{ $lang.tr`Delete` }}</quartz-button>
+            <quartz-button class="control" @click="onBtnCloneClick">{{ $lang.tr`Clone` }}</quartz-button>
         </div>
-        <div class="warning" v-if="$store.state.note.oversizedNotes[noteData.id]">
-            {{ $lang.tr`Cant be syncronized` }}
-        </div>
-    </button>
+    </div>
 </template>
 
 <script>
 import QuartzIconBlock from './QuartzIconBlock';
 import QuartzButton from './QuartzButton';
+import QuartzDivider from './QuartzDivider';
 import * as icons from 'ionicons/icons';
 import styleProps, {applyClasses} from '../mixins/style-props.js';
 
@@ -25,7 +34,8 @@ export default {
     name:"NoteCard",
     components: {
         QuartzIconBlock,
-        QuartzButton
+        QuartzButton,
+        QuartzDivider
     },
 
     props: {
@@ -53,37 +63,82 @@ export default {
         };
     },
     methods: {
+        onCardClick() {
+            this.$router.push({name: "note", params: {id: this.noteData.id}});
+        },
+        onBtnDeleteClick() {
+            this.$store.dispatch('note/deleteNote', this.noteData.id);
+        },
+        onBtnCloneClick() {
+            this.$store.dispatch('note/cloneNote', this.noteData.id);
+        }
     }
 }
 </script>
 
 <style lang="scss" scoped>
-    .card {        
+    .card {
         display: inline-flex;
-        flex-direction: column;
-        padding: 20px;
-        border-radius: 10px;
         font-size: 16px;
-        align-items: stretch;
-        outline: none;
-        border: none;
-        background-color: var(--quartz-color-25);
-        
-        &.has-color {
-            background-image: linear-gradient(to left, var(--note-color) -310%, transparent 150%);
-            border-right: 10px solid var(--note-color);
+        position: relative;
+        background: transparent;
+        // min-height: 140px;
+
+        .content {
+            display: inline-flex;
+            flex-direction: column;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            align-items: stretch;
+            outline: none;
+            border: none;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--quartz-color-25);
+            // position: absolute;
+            z-index: 1;
+
+            &:active {
+                background-color: var(--quartz-color-4);
+            }
+
+            &.has-color {
+                background-image: linear-gradient(to left, var(--note-color) -310%, transparent 150%);
+                border-right: 10px solid var(--note-color);
+
+                &:active {
+                    background-image: linear-gradient(to left, var(--note-color) -320%, transparent 150%);
+                    border-right: 10px solid var(--note-color);
+                }
+            }
         }
-        
-        &:not(.has-color) {
-            padding-right: 30px;
+
+        .controls {
+            text-align: left;
+            margin-bottom: 10px;
+            line-height: 22px;
+            z-index: 2;
+            bottom: 40px;
+            left: 20px;
+            position: absolute;
+
+            .control {
+                height: 30px;
+                margin: 10px 10px 0px 0px;
+            }
         }
-    
-        &:active {
-            background-color: var(--quartz-color-4);
-        }
-        &:active.has-color {
-            background-image: linear-gradient(to left, var(--note-color) -320%, transparent 150%);
-            border-right: 10px solid var(--note-color);
+
+        &:not(.has-warning) {
+            .content .divider {
+                margin-bottom: 53px;
+            }
+
+            .controls {
+                bottom: 15px;
+            }
         }
     
         .title {
@@ -93,25 +148,7 @@ export default {
             word-wrap: break-word;
         }
     
-        .controls {
-            text-align: left;
-            margin-bottom: 10px;
-            line-height: 22px;
-
-            .control {
-                height: 30px;
-                margin: 10px 10px 0px 0px;
-            }
-        }
         
-        .divider {
-            width: 100%;
-            background: linear-gradient(to right, var(--quartz-color-1-contrast) -30%, transparent 100%);
-            padding: 0;
-            margin-left: 0;
-            margin-bottom: 13px;
-            height: 2px;
-        }
 
         .info {
             font-size: 11px;
@@ -120,7 +157,7 @@ export default {
 
         .warning {
             font-size: 13px;
-            margin: 13px 0px 0px 0px;
+            margin: 53px 0px 0px 0px;
         }
     }
 </style>

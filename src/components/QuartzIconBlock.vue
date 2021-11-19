@@ -1,11 +1,14 @@
 <template>
-    <div class="icon-block" v-bind:class="mainClasses">
+    <div
+        class="icon-block"
+        :class="mainClasses"
+    >
         <ion-icon
             v-if="icon && iconPosition == 'left'"
             class="icon-block__icon"
             :ios="icon"
             :md="icon"
-            v-bind:style="{'font-size': iconSize+'px'}"
+            :style="{'font-size': iconSize+'px', 'min-width': iconSize+'px'}"
         ></ion-icon>
         <div class="icon-block__content">
             <slot></slot>
@@ -15,7 +18,7 @@
             class="icon-block__icon"
             :ios="icon"
             :md="icon"
-            v-bind:style="{'font-size': iconSize+'px'}"
+            :style="{'font-size': iconSize+'px', 'min-width': iconSize+'px'}"
         ></ion-icon>
     </div>
 </template>

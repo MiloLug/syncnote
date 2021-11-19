@@ -5,6 +5,7 @@
     "Language|settings section": "Мова",
     "Theme|settings section": "Тема",
     "Account|settings section": "Аккаунт",
+    "Dangerous|settings section": "Небезпечна зона",
     
     "Login|field": "Логін",
     "Email": "E-mail",
@@ -30,5 +31,16 @@
     "Add tag": "Додати тег",
 
     "No connection": "Немає з'єднання",
-    "Cant be syncronized": "Неможливо синхронізувати"
+    "Cant be syncronized": "Неможливо синхронізувати",
+
+    "Delete": "Видалити",
+    "Clone": "Копіювати",
+
+    "Old password": "Старий пароль",
+    "New password": "Новий пароль",
+    "Save": "Зберегти",
+
+    "Remove account": "Видалити аккаунт",
+    "account deleteion confirmation": "Якщо ви дійсно хочете видалити акаунт - впишіть у поле 'видалити'",
+    "account deleteion confirmation response": "видалити"
 }
