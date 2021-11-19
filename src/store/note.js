@@ -55,7 +55,7 @@ let finishInitialization;
 export default {
     namespaced: true,
     state: () => ({
-        initialized: new Promise((res, rej) => (finishInitialization = res)),
+        initialized: new Promise((res) => (finishInitialization = res)),
 
         notes: {},  // {id: Note}
         orderedNotes: [],  // [note id]

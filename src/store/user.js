@@ -88,7 +88,7 @@ export default {
         }
     },
     actions: {
-        async init({ state, commit, dispatch }) {
+        async init({ state, dispatch }) {
             await dispatch('loadStorage');
 
             if(state.isAuthenticated) {
