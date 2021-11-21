@@ -500,17 +500,18 @@ export default {
             const noteStorage = await NoteStorage;
             const remoteId = state.localRemoteIds[noteId] ?? noteId;
 
-            await noteStorage.remove(noteId);
             commit('deleteNote', noteId);
+            await Promise.all([noteStorage.remove(noteId), noteStorage.remove(remoteId)]);
             commit('notesOrderingUpdate');
             commit('tagsUpdate');
 
-            try {
-                await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
-            }
-            catch(e) {
-                handleError(dispatch, e, 2000, false);
-            }
+            if(rootState.user.isAuthenticated)
+                try {
+                    await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
+                }
+                catch(e) {
+                    handleError(dispatch, e, 2000, true, {404: true});
+                }
         },
         async cloneNote({ state, dispatch }, noteId) {
             const note = state.notes[noteId];

@@ -1,7 +1,9 @@
 import localization from '../localization';
 
-export async function handleError(dispatch, e, timeShow, noThrow=false) {
+export async function handleError(dispatch, e, timeShow, noThrow=false, ignore={}) {
     let data = e?.response?.data;
+    if(ignore[e?.response?.status])
+        return;
 
     // so if there is text-only error, then I can just show a notification
     if(data?.detail || typeof(data) === "string") {

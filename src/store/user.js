@@ -124,6 +124,7 @@ export default {
             }
         },
         async logout({ commit, dispatch }) {
+            set_axios_auth();
             commit('logout');
             await dispatch('updateStorage');
         },
