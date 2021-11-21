@@ -1,5 +1,5 @@
 <template>
-    <div class="banner" v-if="show">
+    <div class="banner" v-if="!$store.state.hasConnection">
         <div class="bg"></div>
         <div class="content">
             <div class="icon-wrapper">
@@ -19,7 +19,6 @@
 <script>
 
 import { IonIcon } from "@ionic/vue";
-import { Network, Connection } from "@ionic-native/network";
 import { wifiOutline } from "ionicons/icons";
 
 export default {
@@ -30,39 +29,9 @@ export default {
 
     data() {
         return {
-            show: Network.type === Connection.NONE,
-            wifiOutline,
-            
-            connectSubscription: null,
-            disconnectSubscription: null
+            wifiOutline
         };
     },
-
-    methods: {
-        onConnect() {
-            this.show = false;
-        },
-        onDisconnect() {
-            this.show = true;
-        },
-
-        subscribe() {
-            this.unsubscribe();
-            this.connectSubscription = Network.onConnect().subscribe(this.onConnect);
-            this.disconnectSubscription = Network.onDisconnect().subscribe(this.onDisconnect);
-        },
-        unsubscribe() {
-            this.connectSubscription?.unsubscribe?.();
-            this.disconnectSubscription?.unsubscribe?.();
-        }
-    },
-
-    mounted() {
-        this.subscribe();
-    },
-    unmounted() {
-        this.unsubscribe();
-    }
 }
 </script>
 

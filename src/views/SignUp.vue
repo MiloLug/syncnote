@@ -9,6 +9,12 @@
                     :placeholder="$lang.tr`Login|field` + ' *'"
                     v-model="username"
                 />
+                <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
+                    <li class="error" v-for="e in usernameErrors" :key="e">
+                        {{ $lang.tr(e) }}
+                    </li>
+                </ul>
+
                 <quartz-input
                     format="email"
                     :icon="mailOutline"
@@ -16,6 +22,12 @@
                     :placeholder="$lang.tr`Email`"
                     v-model="email"
                 />
+                <ul class="errors input-line" v-if="hasErrors && emailErrors.length">
+                    <li class="error" v-for="e in emailErrors" :key="e">
+                        {{ $lang.tr(e) }}
+                    </li>
+                </ul>
+
                 <quartz-input
                     format="password"
                     :icon="keyOutline"
@@ -23,6 +35,11 @@
                     :placeholder="$lang.tr`Password` + ' *'"
                     v-model="password"
                 />
+                <ul class="errors input-line" v-if="hasErrors && passwordErrors.length">
+                    <li class="error" v-for="e in passwordErrors" :key="e">
+                        {{ $lang.tr(e) }}
+                    </li>
+                </ul>
                 
                 <div class="input-line controls">
                     <quartz-button type="submit" class="submit-button" shadow="center">
@@ -60,31 +77,52 @@ export default {
 
             username: "",
             email: "",
-            password: ""
+            password: "",
+
+            hasErrors: false,
+            usernameErrors: [],
+            emailErrors: [],
+            passwordErrors: [],
         };
     },
     methods: {
+        cleanErrors() {
+            this.hasErrors = false;
+            this.usernameErrors = [];
+            this.emailErrors = [];
+            this.passwordErrors = [];
+        },
         onSubmit(e) {
             e.preventDefault();
             this.signUp();
             return false;
         },
         async signUp() {
+            this.cleanErrors();
+
             await this.$store.dispatch("note/applyIdPairs");
 
-            await this.$store.dispatch('user/startRegister', {
-                username: this.username,
-                email: this.email || null,
-                password: this.password
-            });
+            try{
+                await this.$store.dispatch('user/startRegister', {
+                    username: this.username,
+                    email: this.email || null,
+                    password: this.password
+                });
 
-            await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
-            
-            this.$router.push('/');
+                await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+                
+                this.$router.push('/');
 
-            this.username = "";
-            this.email = "";
-            this.password = "";
+                this.username = "";
+                this.email = "";
+                this.password = "";
+            }
+            catch(e) {
+                this.hasErrors = !!e;
+                this.usernameErrors = e?.username ?? [];
+                this.emailErrors = e?.email ?? [];
+                this.passwordErrors = e?.password ?? [];
+            }
         }
     }
 }
@@ -108,6 +146,18 @@ export default {
 
             .submit-button {
                 width: 100%;
+            }
+        }
+
+        &.errors {
+            margin-top: 0px;
+            font-size: 13px;
+            background: linear-gradient(to right, rgba(var(--ion-color-danger-rgb), 0.4), transparent);
+            border-radius: 10px;
+            padding: 2px 10px 5px 20px;
+
+            .error {
+                color: rgba(var(--quartz-text-color-rgb), 0.8);
             }
         }
     }

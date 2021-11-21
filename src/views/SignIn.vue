@@ -9,6 +9,11 @@
                     :placeholder="$lang.tr`Login|field` + ' *'"
                     v-model="username"
                 />
+                <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
+                    <li class="error" v-for="e in usernameErrors" :key="e">
+                        {{ $lang.tr(e) }}
+                    </li>
+                </ul>
                 <quartz-input
                     format="password"
                     :icon="keyOutline"
@@ -56,30 +61,43 @@ export default {
             personOutline,
 
             username: "",
-            password: ""
+            password: "",
+
+            hasErrors: false,
+            usernameErrors: [],
         };
     },
     methods: {
+        cleanErrors() {
+            this.hasErrors = false;
+            this.usernameErrors = [];
+        },
         onSubmit(e) {
             e.preventDefault();
             this.signIn();
             return false;
         },
         async signIn() {
+            this.cleanErrors();
+
             await this.$store.dispatch("note/applyIdPairs");
 
-            await this.$store.dispatch('user/startAuth', {
-                username: this.username,
-                password: this.password
-            });
-            
-            await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+            try{
+                await this.$store.dispatch('user/startAuth', {
+                    username: this.username,
+                    password: this.password
+                });
+                
+                await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
 
-            if(this.$store.state.user.isAuthenticated){
                 this.username = "";
                 this.password = "";
 
                 this.$router.push('/');
+            }
+            catch(e) {
+                this.hasErrors = !!e;
+                this.usernameErrors = e?.username ?? [];
             }
         }
     }
@@ -104,6 +122,18 @@ export default {
 
             .submit-button {
                 width: 100%;
+            }
+        }
+
+        &.errors {
+            margin-top: 0px;
+            font-size: 13px;
+            background: linear-gradient(to right, rgba(var(--ion-color-danger-rgb), 0.4), transparent);
+            border-radius: 10px;
+            padding: 2px 10px 5px 20px;
+
+            .error {
+                color: rgba(var(--quartz-text-color-rgb), 0.8);
             }
         }
     }

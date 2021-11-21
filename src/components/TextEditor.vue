@@ -104,7 +104,6 @@
     </div>
     <div class="editor-content-wrapper">
         <editor-content
-            :data-placeholder="$lang.tr`Start writing`"
             class="editor-content"
             :editor="editor"
         />
@@ -159,7 +158,9 @@ export default {
             extensions: [
                 Indent,
                 StarterKit,
-                Placeholder,
+                Placeholder.configure({
+                    placeholder: () => this.$lang.tr`Start writing`
+                }),
             ],
             content: this.modelValue,
             onUpdate: () => {

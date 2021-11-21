@@ -2,14 +2,12 @@ import axios from 'axios';
 import { NoteStorage } from './storage';
 
 import { BASE_URL } from '../api.settings.js';
+import localization from '@/localization';
+import { handleError } from './utils';
 
 
 export const COLLECT_START = 1;
-export const COLLECT_SUCCESS = 2;
-export const COLLECT_ERROR = 3;
-export const UPLOAD_START = 4;
-export const UPLOAD_SUCCESS = 5;
-export const UPLOAD_ERROR = 6;
+export const COLLECT_END = 2;
 
 export const NOTES_GENERAL_URL = `${BASE_URL}/notes`;
 export const GET_UPDATES_URL = `${NOTES_GENERAL_URL}/get-updates/`;
@@ -82,21 +80,8 @@ export default {
         collectStart(state) {
             state.status = COLLECT_START;
         },
-        collectError(state) {
-            state.status = COLLECT_ERROR;
-        },
-        collectSuccess(state) {
-            state.status = COLLECT_SUCCESS;
-        },
-
-        uploadStart(state) {
-            state.status = UPLOAD_START;
-        },
-        uploadError(state) {
-            state.status = UPLOAD_ERROR;
-        },
-        uploadSuccess(state) {
-            state.status = UPLOAD_SUCCESS;
+        collectEnd(state) {
+            state.status = COLLECT_END;
         },
 
         newOrdering(state, orderingFunction=sortUpdatedAtDesc) {
@@ -320,7 +305,7 @@ export default {
         }
     },
     actions: {
-        async collectNotes({ state, commit }, useServer=false) {
+        async collectNotes({ state, commit, dispatch }, useServer=false) {
             const noteStorage = await NoteStorage;
             // TODO: remove this
             window.noteStorage = noteStorage;
@@ -356,11 +341,12 @@ export default {
                         };
                         notesToSave.push(note.id);
                     }
-
-                    commit('collectSuccess');
                 }
                 catch(e) {
-                    commit('collectError');
+                    handleError(dispatch, e, 4000, true);
+                }
+                finally {
+                    commit('collectEnd');
                 }
             }
 
@@ -396,13 +382,14 @@ export default {
             ));
         },
 
-        async saveRemoteNotes({ state, commit }) {
+        async saveRemoteNotes({ state, commit, dispatch, rootState }) {
+            if(!rootState.hasConnection)
+                return;
+
             const toSave = Object.keys(state.notesToSend).filter(id => !state.oversizedNotes[id]);
             commit('cleanSendingQueue');
 
             if(!toSave.length) return;
-
-            commit('uploadStart');
 
             const data = toSave.map(
                 id => ({
@@ -422,11 +409,15 @@ export default {
                     });
                 }
 
-                commit('uploadSuccess');
                 return res;
             }
             catch(e) {
-                commit('uploadError');
+                dispatch('placeNotification', {
+                    text: localization.state.tr`Send-updates error`,
+                    type: "danger"
+                }, {root: true});
+
+                commit('addNotesToSend', toSave);
             }
         },
 
@@ -497,7 +488,15 @@ export default {
             updateOrdering && commit('notesOrderingUpdate');
             updateTags && commit('tagsUpdate');
         },
-        async deleteNote({ state, commit }, noteId) {
+        async deleteNote({ state, commit, dispatch, rootState }, noteId) {
+            if(!rootState.hasConnection && rootState.user.isAuthenticated){
+                dispatch('placeNotification', {
+                    text: localization.state.tr`Can't delete note with no connection`,
+                    type: "danger"
+                }, {root: true});
+                return;
+            }
+
             const noteStorage = await NoteStorage;
             const remoteId = state.localRemoteIds[noteId] ?? noteId;
 
@@ -510,7 +509,7 @@ export default {
                 await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
             }
             catch(e) {
-                // todo
+                handleError(dispatch, e, 2000, false);
             }
         },
         async cloneNote({ state, dispatch }, noteId) {

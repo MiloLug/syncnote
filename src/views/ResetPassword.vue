@@ -24,7 +24,7 @@
 </template>
 
 <script lang="js">
-import { IonPage } from '@ionic/vue';
+import { IonContent, IonPage } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import { mailOutline } from 'ionicons/icons';
@@ -34,6 +34,7 @@ export default {
     name: 'ResetPassword',
     components: {
         IonPage,
+        IonContent,
         QuartzInput,
         QuartzButton,
         QuartzConnectionBanner
@@ -54,12 +55,18 @@ export default {
         },
 
         async initReset() {
+            if(!this.email)
+                return;
+
             await this.$store.dispatch('user/resetPasswordInit', {
-                email: this.email
+                email: this.email,
+                time: 5000
+            });
+            this.$store.dispatch('placeNotification', {
+                text: this.$lang.tr`Restore email sent to ...` + this.email
             });
 
             this.email = "";
-            console.log(this.$router);
 
             this.$router.go(-1);
         }

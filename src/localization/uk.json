@@ -4,16 +4,18 @@
 
     "Language|settings section": "Мова",
     "Theme|settings section": "Тема",
-    "Account|settings section": "Аккаунт",
+    "Account|settings section": "Акаунт",
     "Dangerous|settings section": "Небезпечна зона",
     
     "Login|field": "Логін",
     "Email": "E-mail",
     "Sign Up": "Реєстрація",
     "Sign In": "Авторизація",
+    "Log Out": "Вийти",
     "Send|password reset": "Відіслати запит",
     "reset password description": "* Якщо пошти немає в списку користувачів, то ви <b>не будете про це повідомлені</b> в цілях безбеки.",
-    "account settings description": "* Ви можете взагалі <b>прибрати e-mail</b> з аккаунта.",
+    "account settings description": "* Ви можете взагалі <b>прибрати e-mail</b> з акаунта.",
+    "Forgot password?": "Забули пароль?",
 
     "Settings": "Налаштування",
 
@@ -40,7 +42,16 @@
     "New password": "Новий пароль",
     "Save": "Зберегти",
 
-    "Remove account": "Видалити аккаунт",
+    "Remove account": "Видалити акаунт",
     "account deleteion confirmation": "Якщо ви дійсно хочете видалити акаунт - впишіть у поле 'видалити'",
-    "account deleteion confirmation response": "видалити"
+    "account deleteion confirmation response": "видалити",
+
+    "Start writing": "Почніть писати ...",
+
+    "Send-updates error": "Помилка відправлення нотаток на сервер",
+    "Auth error": "Помилка при авторизації",
+    "No active account found with the given credentials": "Не знайдено акаунтів із зазначеними обліковими даними",
+    "Can't delete note with no connection": "Неможливо видалити запис. Ви авторизовані, але не маєте доступу до мережі",
+    
+    "Restore email sent to ...": "Лист для скидання пароля відправлено на "
 }

@@ -11,9 +11,11 @@
     "Email": "Email",
     "Sign Up": "Sign Up",
     "Sign In": "Sign In",
+    "Log Out": "Log Out",
     "Send|password reset": "Send request",
     "reset password description": "* If the address is not in the user list, you will <b>not be notified</b> for security purposes.",
     "account settings description": "* You <b>can remove your email</b> from the account.",
+    "Forgot password?": "Forgot password?",
 
     "Settings": "Settings",
 
@@ -42,5 +44,14 @@
 
     "Remove account": "Remove account",
     "account deleteion confirmation": "If you really want to DELETE tour account, then write 'delete'",
-    "account deleteion confirmation response": "delete"
+    "account deleteion confirmation response": "delete",
+
+    "Start writing": "Start writing ...",
+
+    "Send-updates error": "Notes uploading error. The notes were not uploaded!",
+    "Auth error": "Authorization error",
+    "No active account found with the given credentials": "No active account found with the given credentials",
+    "Can't delete note with no connection": "It's impossible to delete the note. You are authenticated bud don't have connection",
+    
+    "Restore email sent to ...": "A password reset email has been sent to "
 }

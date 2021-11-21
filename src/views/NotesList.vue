@@ -293,6 +293,7 @@ export default {
 
             &.selected {
                 background: var(--quartz-color-15);
+                color: rgba(var(--quartz-color-4-contrast-rgb), 0.7);
                 box-shadow: none;
             }
         }

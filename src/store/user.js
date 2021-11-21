@@ -3,10 +3,7 @@ import axios from 'axios';
 import { UserStorage } from './storage';
 import { BASE_URL } from '../api.settings.js';
 import localization from '../localization';
-
-export const AUTH_START = 1;
-export const AUTH_SUCCESS = 2;
-export const AUTH_ERROR = 3;
+import { handleError } from './utils';
 
 export const AUTH_URL = `${BASE_URL}/user/auth/`;
 export const REGISTER_URL = `${BASE_URL}/user/register/`;
@@ -44,17 +41,6 @@ export default {
         username: "",
     }),
     mutations: {
-        authStart(state) {
-            state.status = AUTH_START;
-        },
-        authSuccess(state, token) {
-            state.status = AUTH_SUCCESS;
-            state.token = token;
-            state.isAuthenticated = true;
-        },
-        authError(state) {
-            state.status = AUTH_ERROR;
-        },
         logout(state) {
             state.status = null;
             state.isAuthenticated = false;
@@ -97,14 +83,16 @@ export default {
             }
         },
 
-        async startAuth({commit, dispatch}, data) {
-            commit('authStart');
+        async startAuth({ dispatch, commit }, data) {
             try {
                 const res = await axios.post(AUTH_URL, data);
                 const token = res.data.access;
                 set_axios_auth(token);
                 
-                commit('authSuccess', token);
+                commit('setAuth', {
+                    token: token,
+                    isAuthenticated: true
+                });
                 await dispatch('updateStorage');
                 await dispatch('getProfile');
                 
@@ -112,20 +100,19 @@ export default {
             }
             catch(e) {
                 set_axios_auth();
-                
-                commit('authError', e);
-                
-                // todo
+                await handleError(dispatch, e, 2000);
             }
         },
-        async startRegister({commit, dispatch}, data) {
-            commit('authStart');
+        async startRegister({ dispatch, commit }, data) {
             try {
                 const res = await axios.post(REGISTER_URL, data);
                 const token = res.data.access;
                 set_axios_auth(token);
-                
-                commit('authSuccess', token);
+
+                commit('setAuth', {
+                    token: token,
+                    isAuthenticated: true
+                });
                 await dispatch('updateStorage');
                 await dispatch('getProfile');
                 
@@ -133,10 +120,7 @@ export default {
             }
             catch(e) {
                 set_axios_auth();
-                
-                commit('authError', e);
-                
-                // todo
+                await handleError(dispatch, e, 2000);
             }
         },
         async logout({ commit, dispatch }) {
@@ -169,7 +153,7 @@ export default {
                 return res;
             }
             catch(e) {
-                // todo
+                await handleError(dispatch, e, 2000, true);
             }
         },
         async updateUserData({ dispatch }, data) {
@@ -184,7 +168,7 @@ export default {
                 await dispatch('getProfile');
             }
             catch(e) {
-                // todo
+                await handleError(dispatch, e, 2000);
             }
         },
         async deleteAccount({ dispatch }) {
@@ -193,7 +177,7 @@ export default {
                 await dispatch('logout');
             }
             catch(e) {
-                // todo
+                await handleError(dispatch, e, 4000);
             }
         },
 
@@ -250,7 +234,7 @@ export default {
                 await axios.patch(PROFILE_URL, {lang});
             }
             catch(e) {
-                // todo
+                await handleError(dispatch, e, 2000, true);
             }
         },
 

@@ -57,7 +57,7 @@ export default {
 
     watch: {
         note(value) {
-            if(value.title || value.content)
+            if(value.title)
                 this.$store.dispatch('note/commitNote', value);
         },
     },

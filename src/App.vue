@@ -2,20 +2,45 @@
     <IonApp>
         <ion-router-outlet id="main-content"></ion-router-outlet>
         <quartz-bar id="main-bar" :content="quartzBarContent"></quartz-bar>
+        <div class="notifications">
+            <div
+                class="notification"
+                v-for="notification in $store.state.notifications"
+                :key="notification"
+                :class="[notification.type]"
+            >
+                <div class="type-icon">
+                    <ion-icon
+                        v-if="notification.type === 'danger'"
+                        class="icon"
+                        :ios="alertOutline"
+                        :md="alertOutline"
+                    />
+                    <ion-icon
+                        v-if="notification.type === 'info'"
+                        class="icon"
+                        :ios="informationOutline"
+                        :md="informationOutline"
+                    />
+                </div>
+                <div class="content" v-html="notification.text"></div>
+            </div>
+        </div>
     </IonApp>
 </template>
 
 <script lang="js">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
+import { IonApp, IonIcon, IonRouterOutlet } from '@ionic/vue';
 import QuartzBar from './components/QuartzBar';
-import { homeOutline, syncOutline, gridOutline} from 'ionicons/icons';
+import { homeOutline, syncOutline, gridOutline, alertOutline, informationOutline} from 'ionicons/icons';
 
 export default {
     name: "App",
     components: {
         IonApp,
         IonRouterOutlet,
-        QuartzBar
+        QuartzBar,
+        IonIcon
     },
     computed: {
         quartzBarContent() {
@@ -39,7 +64,9 @@ export default {
     },
     data() {
         return {
-            stopLoop: false
+            stopLoop: false,
+            alertOutline,
+            informationOutline
         };
     },
 
@@ -58,6 +85,8 @@ export default {
             setTimeout(loop, 5000);
         };
         loop();
+
+        window.gg = this.$store;
     },
     methods: {
         onKeyboardDidShow() {
@@ -92,6 +121,50 @@ export default {
     },
 };
 </script>
+
+<style lang="scss" scoped>
+    .notifications {
+        position: fixed;
+        right: 5px;
+        overflow: auto;
+        display: inline-block;
+        max-height: 100%;
+        max-width: 290px;
+        width: 90%;
+
+        .notification {
+            position: relative;
+            background: rgba(var(--ion-color-primary-rgb), .9);
+            max-width: 280px;
+            border-radius: 6px 5px 5px 6px;
+            padding: 10px;
+            margin: 5px;
+            padding-left: 25px;
+            
+            .type-icon {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 20px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background: rgba(var(--quartz-color-4-rgb), .4);
+                border-radius: 5px;
+                
+                .icon {
+                    font-size: 20px;
+                    min-width: 20px;
+                }
+            }
+
+            &.danger {
+                background: rgba(var(--ion-color-danger-rgb), .9);
+            }
+        }
+    }
+</style>
 
 <style lang="scss">
     #main-content {

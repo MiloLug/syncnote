@@ -40,6 +40,12 @@
                         :placeholder="$lang.tr`Login|field` + ' *'"
                         v-model="newUsername"
                     />
+                    <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
+                        <li class="error" v-for="e in usernameErrors" :key="e">
+                            {{ $lang.tr(e) }}
+                        </li>
+                    </ul>
+
                     <quartz-input
                         format="email"
                         :icon="mailOutline"
@@ -47,6 +53,12 @@
                         :placeholder="$lang.tr`Email`"
                         v-model="newEmail"
                     />
+                    <ul class="errors input-line" v-if="hasErrors && emailErrors.length">
+                        <li class="error" v-for="e in emailErrors" :key="e">
+                            {{ $lang.tr(e) }}
+                        </li>
+                    </ul>
+
                     <quartz-divider/>
                     <quartz-input
                         format="password"
@@ -55,6 +67,12 @@
                         :placeholder="$lang.tr`Old password`"
                         v-model="oldPassword"
                     />
+                    <ul class="errors input-line" v-if="hasErrors && oldPasswordErrors.length">
+                        <li class="error" v-for="e in oldPasswordErrors" :key="e">
+                            {{ $lang.tr(e) }}
+                        </li>
+                    </ul>
+
                     <quartz-input
                         format="password"
                         :icon="keyOutline"
@@ -62,6 +80,11 @@
                         :placeholder="$lang.tr`New password`"
                         v-model="newPassword"
                     />
+                    <ul class="errors input-line" v-if="hasErrors && newPasswordErrors.length">
+                        <li class="error" v-for="e in newPasswordErrors" :key="e">
+                            {{ $lang.tr(e) }}
+                        </li>
+                    </ul>
                     
                     <div class="input-line controls">
                         <quartz-button type="submit" class="submit-button" shadow="center">
@@ -139,11 +162,26 @@ export default {
             newUsername: this.$store.state.user.username,
             newEmail: this.$store.state.user.email,
             oldPassword: "",
-            newPassword: ""
+            newPassword: "",
+
+
+            hasErrors: false,
+            usernameErrors: [],
+            emailErrors: [],
+            oldPasswordErrors: [],
+            newPasswordErrors: [],
         };
     },
 
     methods: {
+        cleanErrors() {
+            this.hasErrors = false;
+            this.usernameErrors = [];
+            this.emailErrors = [];
+            this.oldPasswordErrors = [];
+            this.newPasswordErrors = [];
+        },
+        
         onBtnThemeClick(theme) {
             this.$store.dispatch('user/setTheme', theme);
         },
@@ -154,6 +192,8 @@ export default {
             return false;
         },
         async updateAccount() {
+            this.cleanErrors();
+
             const data = {
                 email: this.newEmail,
                 username: this.newUsername
@@ -162,12 +202,18 @@ export default {
                 data.newPassword = this.newPassword,
                 data.oldPassword = this.oldPassword;
 
-            console.log(data);
-
-            await this.$store.dispatch('user/updateUserData', data);
-
-            this.oldPassword = "";
-            this.newPassword = "";
+            try {
+                await this.$store.dispatch('user/updateUserData', data);
+                this.oldPassword = "";
+                this.newPassword = "";
+            }
+            catch(e) {
+                this.hasErrors = !!e;
+                this.usernameErrors = e?.username ?? [];
+                this.emailErrors = e?.email ?? [];
+                this.oldPasswordErrors = e?.old_password ?? [];
+                this.newPasswordErrors = e?.new_password ?? [];
+            }
         },
 
         async onBtnDeleteUserClick() {
@@ -221,6 +267,18 @@ export default {
                 &.delete-user {
                     background: rgba(var(--ion-color-danger-rgb), .5);
                 }
+            }
+        }
+
+        &.errors {
+            margin-top: 0px;
+            font-size: 13px;
+            background: linear-gradient(to right, rgba(var(--ion-color-danger-rgb), 0.4), transparent);
+            border-radius: 10px;
+            padding: 2px 10px 5px 20px;
+
+            .error {
+                color: rgba(var(--quartz-text-color-rgb), 0.8);
             }
         }
     }
