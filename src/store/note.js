@@ -284,7 +284,8 @@ export default {
             // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(state.notes);
             let dataSize = 0;
-            for (const id of orderedIds) {
+            for (let i = 0, len = orderedIds.length; i < len; i++) {
+                const id = orderedIds[i];
                 const size = state.notes[id].dataSize;
                 dataSize += size;
 
