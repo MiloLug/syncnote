@@ -13,7 +13,7 @@ export const RESET_PASSWORD = `${BASE_URL}/user/reset-password/`;
 
 
 function set_axios_auth(token=null) {
-    if(token)
+    if (token)
         axios.defaults.headers.common['Authorization'] = 'Bearer ' + token;
     else
         delete axios.defaults.headers.common['Authorization'];
@@ -77,7 +77,7 @@ export default {
         async init({ state, dispatch }) {
             await dispatch('loadStorage');
 
-            if(state.isAuthenticated) {
+            if (state.isAuthenticated) {
                 set_axios_auth(state.token);
                 await dispatch('getProfile');
             }
@@ -160,7 +160,7 @@ export default {
         async updateUserData({ dispatch }, data) {
             data = {...data};
             
-            if(data.newPassword)
+            if (data.newPassword)
                 data.new_password = data.newPassword,
                 data.old_password = data.oldPassword;
                 console.log(data, data.newPassword);
@@ -228,7 +228,7 @@ export default {
         async setLang({ state, dispatch }, lang) {
             await dispatch('setLangLocal', lang);
             
-            if(!state.isAuthenticated)
+            if (!state.isAuthenticated)
                 return;
 
             try {

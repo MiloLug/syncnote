@@ -61,7 +61,7 @@ router.beforeEach(async (to, from, next) => {
     switch(to.name) {
         case 'note':
         case 'note-edit':
-            if(!store.state.note.notes[to.params.id]) {
+            if (!store.state.note.notes[to.params.id]) {
                 store.commit('unsetEditing');
                 next('/');
             }

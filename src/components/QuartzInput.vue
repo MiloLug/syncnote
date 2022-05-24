@@ -28,34 +28,34 @@ const formatsPiping = {
     },
 
     decimal(newVal, oldVal="0") {
-        if(newVal?.constructor === String){
+        if (newVal?.constructor === String) {
             newVal = newVal.trim();
             return (/^(-|\+|)$/).test(newVal)
                 ? newVal
                 : (/(?:-|\+|)(?:\d+(?:\.|)\d*|\d*(?:\.|)\d+)/mi)
                     .exec(newVal)?.[0] ?? oldVal;
         }else{
-            if(!isNaN(newVal)) return newVal;
+            if (!isNaN(newVal)) return newVal;
         }
         return oldVal;
     },
 
     integer(newVal, oldVal="0") {
-        if(newVal?.constructor === String){
+        if (newVal?.constructor === String) {
             newVal = newVal.trim();
             return (/^(-|\+|)$/).test(newVal)
                 ? newVal
                 : (/(?:-|\+|)\d+/mi).exec(newVal)?.[0] ?? oldVal;
         }else{
-            if(!isNaN(newVal)) return newVal;
+            if (!isNaN(newVal)) return newVal;
         }
         return oldVal;
     },
 
     phone(newVal, oldVal="") {
-        if(newVal?.constructor === String){
+        if (newVal?.constructor === String) {
             newVal = newVal.trim();
-            if((/^(\+|)$/).test(newVal))
+            if ((/^(\+|)$/).test(newVal))
                 return newVal
             const match = (/\d{1,15}/mi).exec(newVal)?.[0];
             return match ? '+' + match : oldVal;
@@ -70,7 +70,7 @@ const formatsPiping = {
     },
 
     email(newVal, oldVal="") {
-        if(newVal?.constructor === String){
+        if (newVal?.constructor === String) {
             newVal = newVal.trim();
             return (/(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\]).?/gmi).exec(newVal)?.[0]
 		|| (/(?:[a-z0-9!#$%&'*+/=?^_`{|}.~-]+|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")(?:@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.?)+|\[(?:(?:(?:(?:2(?:5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){0,3}(?:(?:2(?:5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f]|)+|)|)\]?|)|)/gmi).exec(newVal)?.[0]
@@ -84,10 +84,10 @@ function pipeValue(format, ...args) {
         ? formatsPiping[format](...args)
         : args[0];
 
-    if(args.length === 1)
+    if (args.length === 1)
         return filtered;
 
-    if(args.length > 1) {
+    if (args.length > 1) {
         const newVal = args[0],
             oldVal = args[1];
         return filtered.length < oldVal.length && newVal.length > oldVal.length
@@ -149,7 +149,7 @@ export default {
 
     watch: {
         modelValue(value) {
-            if(value === this.dataValue)
+            if (value === this.dataValue)
                 return;
 
             this.dataValue = pipeValue(this.format, value, this.dataValue);

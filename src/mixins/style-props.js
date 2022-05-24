@@ -20,12 +20,12 @@ export default styles.reduce((acc, style)=>(
 
 export function applyClasses(instance) {
     const classes = classStyles.reduce((acc, style)=>{
-        if(instance[style.prop] !== null)
+        if (instance[style.prop] !== null)
             acc.push(style.prefix + instance[style.prop]);
         return acc;
     }, []);
     return cssStyles.reduce((acc, style)=>{
-        if(instance[style.prop] !== null)
+        if (instance[style.prop] !== null)
             acc.push("has-" + style.prop);
         return acc;
     }, classes);
@@ -33,7 +33,7 @@ export function applyClasses(instance) {
 
 export function applyCss(instance) {
     return cssStyles.reduce((acc, style)=>{
-        if(instance[style.prop] !== null)
+        if (instance[style.prop] !== null)
             acc.push(style.cssProp + ":" + instance[style.prop]);
         return acc;
     }, []);

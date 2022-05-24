@@ -78,8 +78,8 @@ export default {
         document.addEventListener("resign", this.saveLocalNotes, false);
 
         const loop = async () => {
-            if(this.stopLoop) return;
-            if(this.$store.state.user.isAuthenticated)
+            if (this.stopLoop) return;
+            if (this.$store.state.user.isAuthenticated)
                 await this.$store.dispatch('note/saveRemoteNotes');
             await this.$store.dispatch('note/saveLocalNotes');
             setTimeout(loop, 5000);

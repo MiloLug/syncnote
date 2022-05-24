@@ -37,8 +37,8 @@ export const sortTitleDesc = notes =>
     );
 
 export const createTagsFilter = filterTags => state => noteId => {
-    for(const tagName of filterTags) {
-        if(!state.tags[tagName]?.[noteId])
+    for (const tagName of filterTags) {
+        if (!state.tags[tagName]?.[noteId])
             return false;
     }
     return true;
@@ -88,7 +88,7 @@ export default {
             state.orderingFunction = orderingFunction;
             let notesIds = state.orderedNotes = orderingFunction(state.notes);
 
-            for(const fn of state.filteringFunctions){
+            for (const fn of state.filteringFunctions){
                 notesIds = notesIds.filter(fn);
             }
             state.filteredNotes = notesIds;
@@ -98,7 +98,7 @@ export default {
             state.filteringFunctions = filteringFunctions.map(fn => fn(state));
             let notesIds = state.orderedNotes;
             
-            for(const fn of state.filteringFunctions){
+            for (const fn of state.filteringFunctions) {
                 notesIds = notesIds.filter(fn);
             }
             state.filteredNotes = notesIds;
@@ -107,13 +107,23 @@ export default {
         tagsUpdate(state) {
             // to not disturb the original object
             const tmpTags = {};
-            for(const note of Object.values(state.notes)){
-                for(const tagName of note.tags){
-                    const tag = tmpTags[tagName] = tmpTags[tagName]
-                        ? tmpTags[tagName]
-                        : {__count__: 1};
+            let notesIds = state.orderedNotes;
 
-                    tag[note.id] = 1;
+            for (let i = 0, len = notesIds.length; i < len; i++) {
+                const note = state.notes[notesIds[i]];
+                const tags = note.tags;
+                const noteId = note.id;
+
+                for (let j = 0, tagsLen = tags.length; j < tagsLen; j++) {
+                    const tagName = tags[j];
+                    const tag = tmpTags[tagName] = (
+                        tmpTags[tagName]
+                        ? tmpTags[tagName]
+                        : {__count__: 0}
+                    );
+
+                    tag[noteId] = true;
+                    tag.__count__++;
                 }
             }
             // to show more popular tags first
@@ -122,9 +132,8 @@ export default {
             );
             state.tags = tmpTags;
 
-            let notesIds = state.orderedNotes;
-            for(const fn of state.filteringFunctions){
-                notesIds = notesIds.filter(fn);
+            for (let i = 0, len = state.filteringFunctions.length; i < len; i++) {
+                notesIds = notesIds.filter(state.filteringFunctions[i]);
             }
             state.filteredNotes = notesIds;
         },
@@ -133,18 +142,18 @@ export default {
             let notesIds = state.orderingFunction(state.notes);
             const newLen = notesIds.length;
             
-            if(newLen === state.orderedNotes.length) {
+            if (newLen === state.orderedNotes.length) {
                 let i = 0;
-                for(; i < newLen && notesIds[i] === state.orderedNotes[i]; i++);
-                if(i === newLen){
+                for (; i < newLen && notesIds[i] === state.orderedNotes[i]; i++);
+                if (i === newLen) {
                     return;
                 }
             }
 
             state.orderedNotes = notesIds;
 
-            for(const fn of state.filteringFunctions){
-                notesIds = notesIds.filter(fn);
+            for (let i = 0, len = state.filteringFunctions.length; i < len; i++) {
+                notesIds = notesIds.filter(state.filteringFunctions[i]);
             }
             state.filteredNotes = notesIds;
         },
@@ -152,8 +161,8 @@ export default {
         notesFilteringUpdate(state) {
             let notesIds = state.orderedNotes;
 
-            for(const fn of state.filteringFunctions){
-                notesIds = notesIds.filter(fn);
+            for (let i = 0, len = state.filteringFunctions.length; i < len; i++) {
+                notesIds = notesIds.filter(state.filteringFunctions[i]);
             }
             state.filteredNotes = notesIds;
         },
@@ -167,11 +176,12 @@ export default {
             // newer records have bigger chances to fall into the oversized list
             // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(notes);
-            for(const id of orderedIds){
+            for (let i = 0, len = orderedIds.length; i < len; i++) {
+                const id = orderedIds[i];
                 const size = notes[id].dataSize;
                 state.dataSize += size;
 
-                if(state.dataSizeLimit !== -1 && (state.dataSize - state.oversizedNotesSize) > state.dataSizeLimit)
+                if (state.dataSizeLimit !== -1 && (state.dataSize - state.oversizedNotesSize) > state.dataSizeLimit)
                     state.oversizedNotes[id] = 1,
                     state.oversizedNotesSize += size;
             }
@@ -182,7 +192,7 @@ export default {
             state.notes[id] = note;
             state.dataSize += note.dataSize;
 
-            if(state.dataSizeLimit !== -1 && state.dataSize > state.dataSizeLimit)
+            if (state.dataSizeLimit !== -1 && state.dataSize > state.dataSizeLimit)
                 state.oversizedNotes[id] = 1,
                 state.oversizedNotesSize += note.dataSize;
 
@@ -192,20 +202,20 @@ export default {
 
         noteUpdate(state, {id, ...note}) {
             // no dataSize = no size update
-            if(note.dataSize !== undefined){
+            if (note.dataSize !== undefined) {
                 const oldSize = state.notes[id].dataSize;
                 const newSize = note.dataSize;
                 
-                if(state.dataSizeLimit !== -1){
+                if (state.dataSizeLimit !== -1) {
                     // so I can remove it from the oversized if it fits the size limit
                     const realSizeRemain = state.dataSizeLimit - (state.dataSize - state.oversizedNotesSize);
 
-                    if(state.oversizedNotes[id]){
+                    if (state.oversizedNotes[id]) {
                         state.oversizedNotesSize -= oldSize;
                         delete state.oversizedNotes[id];
                     }
 
-                    if(newSize > realSizeRemain){
+                    if (newSize > realSizeRemain) {
                         state.oversizedNotes[id] = 1;
                         state.oversizedNotesSize += newSize;
                     }
@@ -226,12 +236,12 @@ export default {
         deleteNote(state, noteId) {
             // no dataSize = no size update
             const note = state.notes[noteId];
-            if(!note) return;
+            if (!note) return;
 
             delete state.notes[noteId];
 
-            if(note.dataSize !== undefined){
-                if(state.dataSizeLimit !== -1 && state.oversizedNotes[noteId]){
+            if (note.dataSize !== undefined) {
+                if (state.dataSizeLimit !== -1 && state.oversizedNotes[noteId]) {
                     state.oversizedNotesSize -= note.dataSize;
                     delete state.oversizedNotes[noteId];
                 }
@@ -243,26 +253,26 @@ export default {
             delete state.notesToSend[noteId];
 
             const remoteId = state.localRemoteIds[noteId];
-            if(remoteId) {
+            if (remoteId) {
                 delete state.localRemoteIds[noteId];
                 delete state.remoteLocalIds[remoteId];
             }
         },
 
         cleanSavingQueue(state, id=null) {
-            if(id) delete state.notesToSave[id];
+            if (id) delete state.notesToSave[id];
             else state.notesToSave = {};
         },
         cleanSendingQueue(state, id=null) {
-            if(id) delete state.notesToSend[id];
+            if (id) delete state.notesToSend[id];
             else state.notesToSend = {};
         },
 
         addNotesToSend(state, ids=[]) {
-            for(const id of ids) state.notesToSend[id] = 1;
+            for (const id of ids) state.notesToSend[id] = 1;
         },
         addNotesToSave(state, ids=[]) {
-            for(const id of ids) state.notesToSave[id] = 1;
+            for (const id of ids) state.notesToSave[id] = 1;
         },
 
         dataSizeLimitUpdate(state, limit=-1) {
@@ -274,11 +284,11 @@ export default {
             // since they will be handled at the end
             const orderedIds = sortUpdatedAtAsc(state.notes);
             let dataSize = 0;
-            for(const id of orderedIds){
+            for (const id of orderedIds) {
                 const size = state.notes[id].dataSize;
                 dataSize += size;
 
-                if(limit !== -1 && dataSize > limit)
+                if (limit !== -1 && dataSize > limit)
                     state.oversizedNotes[id] = 1,
                     state.oversizedNotesSize += size;
             }
@@ -292,9 +302,9 @@ export default {
         },
 
         cleanIdPairs(state, localId) {
-            if(localId) {
+            if (localId) {
                 const remoteId = state.localRemoteIds[localId];
-                if(remoteId) {
+                if (remoteId) {
                     delete state.localRemoteIds[localId];
                     delete state.remoteLocalIds[remoteId];
                 }
@@ -316,7 +326,7 @@ export default {
                 tmpList[key] = value;
             });
 
-            if(useServer && state.status !== COLLECT_START) {
+            if (useServer && state.status !== COLLECT_START) {
                 commit('collectStart');
 
                 const data = Object.values(tmpList).map(
@@ -326,7 +336,7 @@ export default {
                     const res = await axios.post(GET_UPDATES_URL, data);
                     commit('addNotesToSend', res.data?.notes_to_send ?? []);
 
-                    for(const note of res.data?.notes_updated ?? []){
+                    for (const note of res.data?.notes_updated ?? []) {
                         const id = state.remoteLocalIds[note.id] ?? note.id;
 
                         tmpList[id] = {
@@ -363,14 +373,14 @@ export default {
             const toSave = Object.keys(state.notesToSave);
             commit('cleanSavingQueue');
 
-            if(!toSave.length) return;
+            if (!toSave.length) return;
 
             await Promise.all(toSave.map(
                 async id => {
                     // if there is a new id (after uploading to the server),
                     // I'll use it to update the note in the store
                     const realId = state.localRemoteIds[id] ?? id;
-                    if(realId !== id)
+                    if (realId !== id)
                         await noteStorage.remove(id);
 
                     await noteStorage.set(realId, {
@@ -383,13 +393,13 @@ export default {
         },
 
         async saveRemoteNotes({ state, commit, dispatch, rootState }) {
-            if(!rootState.hasConnection)
+            if (!rootState.hasConnection)
                 return;
 
             const toSave = Object.keys(state.notesToSend).filter(id => !state.oversizedNotes[id]);
             commit('cleanSendingQueue');
 
-            if(!toSave.length) return;
+            if (!toSave.length) return;
 
             const data = toSave.map(
                 id => ({
@@ -402,7 +412,7 @@ export default {
 
             try {
                 const res = await axios.post(SEND_UPDATES_URL, data);
-                for(const localRemote of res.data ?? []){
+                for (const localRemote of res.data ?? []) {
                     commit('addIdPair', {
                         local: localRemote.local_id,
                         remote: localRemote.remote_id
@@ -423,7 +433,7 @@ export default {
 
         async sync({ dispatch }, useServer=false) {
             await dispatch('collectNotes', useServer);
-            if(useServer) {
+            if (useServer) {
                 await dispatch('saveRemoteNotes');
             }
             await dispatch('saveLocalNotes');
@@ -446,7 +456,7 @@ export default {
             commit('newNote', note);
             commit('notesOrderingUpdate');
 
-            if(note.tags.length)
+            if (note.tags.length)
                 commit('tagsUpdate');
         },
         async updateNote({ state, commit }, note) {
@@ -480,7 +490,7 @@ export default {
                 ...note,
                 updatedAt: Date.now()
             };
-            if(note.content !== undefined)
+            if (note.content !== undefined)
                 update.dataSize = note.content.length;
             
             commit('noteUpdate', update);
@@ -489,7 +499,7 @@ export default {
             updateTags && commit('tagsUpdate');
         },
         async deleteNote({ state, commit, dispatch, rootState }, noteId) {
-            if(!rootState.hasConnection && rootState.user.isAuthenticated){
+            if (!rootState.hasConnection && rootState.user.isAuthenticated) {
                 dispatch('placeNotification', {
                     text: localization.state.tr`Can't delete note with no connection`,
                     type: "danger"
@@ -505,7 +515,7 @@ export default {
             commit('notesOrderingUpdate');
             commit('tagsUpdate');
 
-            if(rootState.user.isAuthenticated)
+            if (rootState.user.isAuthenticated)
                 try {
                     await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
                 }
@@ -523,7 +533,7 @@ export default {
         },
 
         async commitNote({ state, dispatch }, note) {
-            if(state.notes[note.id])
+            if (state.notes[note.id])
                 dispatch('updateNote', note);
             else
                 dispatch('addNote', note);

@@ -55,7 +55,7 @@ export default {
         },
 
         async initReset() {
-            if(!this.email)
+            if (!this.email)
                 return;
 
             await this.$store.dispatch('user/resetPasswordInit', {

@@ -29,8 +29,8 @@ export default {
         noteOrigin: {
             get() {
                 // so, without passing an id, I can use it in create mode
-                if(!this.$route.params.id){
-                    if(this.note?.id !== this.$route.params.createId)
+                if (!this.$route.params.id) {
+                    if (this.note?.id !== this.$route.params.createId)
                         return {
                             id: this.$route.params.createId
                         };
@@ -40,7 +40,7 @@ export default {
                 const origin = this.$store.state.note.notes[this.$route.params.id];
 
                 // return only a copy
-                if(origin){
+                if (origin) {
                     return {
                         ...origin,
                         tags: [...origin.tags]
@@ -57,7 +57,7 @@ export default {
 
     watch: {
         note(value) {
-            if(value.title)
+            if (value.title)
                 this.$store.dispatch('note/commitNote', value);
         },
     },

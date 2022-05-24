@@ -11,10 +11,10 @@ export default {
         },
 
         hide(state, forced=false) {
-            if(state.demandersNumber === 0)
+            if (state.demandersNumber === 0)
                 return;
 
-            if(forced)
+            if (forced)
                 state.show = state.demandersNumber = 0;
             else
                 state.show = !! --state.demandersNumber;

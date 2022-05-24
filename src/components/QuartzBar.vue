@@ -62,8 +62,8 @@ export default {
             defauld: ()=>[],
             required: true,
             validator: content => {
-                for(const entry of content){
-                    if(entryIsInvalid(entry)) return false;
+                for (const entry of content){
+                    if (entryIsInvalid(entry)) return false;
                 }
                 return true;
             }

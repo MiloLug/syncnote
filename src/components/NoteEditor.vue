@@ -174,12 +174,12 @@ export default {
             const used = [];
             const others = [];
 
-            for(const tagName of this.$store.state.note.orderedTagNames)
+            for (const tagName of this.$store.state.note.orderedTagNames)
                 (this.tags.indexOf(tagName) === -1 ? others : used).push(tagName);
 
             // to add "virtual" tags that aren't presented in the store (creation time)
-            for(const tag of this.tags)
-                if(used.indexOf(tag) === -1) used.push(tag);
+            for (const tag of this.tags)
+                if (used.indexOf(tag) === -1) used.push(tag);
 
             return [...used, ...others];
         }
@@ -217,13 +217,13 @@ export default {
         onBtnAddTagClick() {
             const tag = this.tag.trim().toLowerCase();
 
-            if(tag && this.tags.indexOf(tag) === -1) {
+            if (tag && this.tags.indexOf(tag) === -1) {
                 this.tags = [...this.tags, tag];
             }
             this.tag = "";
         },
         onBtnTagClick(tag) {
-            if(this.tags.indexOf(tag) === -1)
+            if (this.tags.indexOf(tag) === -1)
                 this.tags = [...this.tags, tag];
             else
                 this.tags = this.tags.filter(tagName => tagName !== tag);

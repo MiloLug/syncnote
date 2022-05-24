@@ -198,7 +198,7 @@ export default {
                 email: this.newEmail,
                 username: this.newUsername
             };
-            if(this.newPassword)
+            if (this.newPassword)
                 data.newPassword = this.newPassword,
                 data.oldPassword = this.oldPassword;
 
@@ -217,7 +217,7 @@ export default {
         },
 
         async onBtnDeleteUserClick() {
-            if(prompt(this.$lang.tr`account deleteion confirmation`) === this.$lang.tr`account deleteion confirmation response`) {
+            if (prompt(this.$lang.tr`account deleteion confirmation`) === this.$lang.tr`account deleteion confirmation response`) {
                 await this.$store.dispatch('note/applyIdPairs');
                 await this.$store.dispatch('user/deleteAccount');
             }

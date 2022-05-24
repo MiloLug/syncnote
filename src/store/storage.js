@@ -19,4 +19,3 @@ async function getStorage(dbName) {
 
 export const NoteStorage = getStorage('__Note');
 export const UserStorage = getStorage('__User');
-

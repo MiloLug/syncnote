@@ -131,7 +131,7 @@ export default {
             const used = [];
             const others = [];
 
-            for(const tagName of this.$store.state.note.orderedTagNames)
+            for (const tagName of this.$store.state.note.orderedTagNames)
                 (this.tagsSelected[tagName] ? used : others).push(tagName);
 
             return [...used, ...others];
@@ -151,11 +151,11 @@ export default {
         },
         storeTags() {
             let update = false;
-            for(const tag of Object.getOwnPropertyNames(this.tagsSelected)) {
-                if((update = !this.$store.state.note.tags[tag]))
+            for (const tag of Object.getOwnPropertyNames(this.tagsSelected)) {
+                if ((update = !this.$store.state.note.tags[tag]))
                     delete this.tagsSelected[tag];
             }
-            if(update)
+            if (update)
                 this.tagsSelected = {...this.tagsSelected};
         }
     },
@@ -205,7 +205,7 @@ export default {
             this.showTagsMenu = !this.showTagsMenu;
         },
         onBtnTagClick(tagName) {
-            if(this.tagsSelected[tagName])
+            if (this.tagsSelected[tagName])
                 delete this.tagsSelected[tagName],
                 this.tagsSelected = {...this.tagsSelected};
             else
