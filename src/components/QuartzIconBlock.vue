@@ -75,4 +75,3 @@ export default {
         margin-left: 10.3px;
     }    
 </style>
-
