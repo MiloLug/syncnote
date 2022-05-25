@@ -1,9 +1,9 @@
 import axios from 'axios';
 import { NoteStorage, CommonStorage, DeletionStorage } from './storage';
 
-import { BASE_URL } from '../api.settings.js';
+import { BASE_URL } from '@/api.settings.js';
 import localization from '@/localization';
-import { handleError } from './utils';
+import { handleError, calculateNoteSize, filter, sort } from './utils';
 
 
 export const COLLECT_START = 1;
@@ -12,40 +12,6 @@ export const COLLECT_END = 2;
 export const NOTES_GENERAL_URL = `${BASE_URL}/notes`;
 export const EXCHANGE_ACTIONS_URL = `${NOTES_GENERAL_URL}/exchange-actions/`;
 export const APPLY_UPDATES_URL = `${NOTES_GENERAL_URL}/apply-updates/`;
-
-
-
-// notes sorting functions:
-export const sortUpdatedAtAsc = notes => 
-    Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].updatedAt - notes[b].updatedAt
-    );
-
-export const sortUpdatedAtDesc = notes => 
-    Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[b].updatedAt - notes[a].updatedAt
-    );
-
-export const sortTitleAsc = notes => 
-    Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[a].title.localeCompare(notes[b].title)
-    );
-
-export const sortTitleDesc = notes => 
-    Object.getOwnPropertyNames(notes).sort(
-        (a, b) => notes[b].title.localeCompare(notes[a].title)
-    );
-
-export const createTagsFilter = filterTags => state => noteId => {
-    for (const tagName of filterTags) {
-        if (!state.tags[tagName]?.[noteId])
-            return false;
-    }
-    return true;
-};
-
-export const createTitleFilter = searchString => state => noteId =>
-    state.notes[noteId].title.indexOf(searchString) !== -1;
 
 
 let finishInitialization;
@@ -77,7 +43,7 @@ export default {
         tags: {},  // {tag name: {note id: bool, ..., __count__: int}}
         orderedTagNames: [],  // [tag name]
         
-        orderingFunction: sortUpdatedAtDesc,
+        orderingFunction: sort.updatedAtDesc,
         filteringFunctions: [],
     }),
     mutations: {
@@ -95,7 +61,7 @@ export default {
             state.lastServerUpdateTime = time;
         },
 
-        newOrdering(state, orderingFunction=sortUpdatedAtDesc) {
+        newOrdering(state, orderingFunction=sort.updatedAtDesc) {
             state.orderingFunction = orderingFunction;
             let notesIds = state.orderedNotes = orderingFunction(state.notes);
 
@@ -186,7 +152,7 @@ export default {
 
             // newer records have bigger chances to fall into the oversized list
             // since they will be handled at the end
-            const orderedIds = sortUpdatedAtAsc(notes);
+            const orderedIds = sort.updatedAtAsc(notes);
             for (let i = 0, len = orderedIds.length; i < len; i++) {
                 const id = orderedIds[i];
                 const size = notes[id].dataSize;
@@ -307,7 +273,7 @@ export default {
 
             // newer records have bigger chances to fall into the oversized list
             // since they will be handled at the end
-            const orderedIds = sortUpdatedAtAsc(state.notes);
+            const orderedIds = sort.updatedAtAsc(state.notes);
             let dataSize = 0;
             for (let i = 0, len = orderedIds.length; i < len; i++) {
                 const id = orderedIds[i];
@@ -567,14 +533,14 @@ export default {
 
             // update the ordering only when it's needed
             switch(state.orderingFunction) {
-                case sortUpdatedAtDesc:
+                case sort.updatedAtDesc:
                     updateOrdering = state.orderedNotes[0] !== note.id;
                     break;
-                case sortUpdatedAtAsc:
+                case sort.updatedAtAsc:
                     updateOrdering = state.orderedNotes[state.orderedNotes.length - 1] !== note.id;
                     break;
-                case sortTitleAsc:
-                case sortTitleDesc:
+                case sort.titleAsc:
+                case sort.titleDesc:
                     updateOrdering = note?.title !== oldNote.title;
                     break;
             }

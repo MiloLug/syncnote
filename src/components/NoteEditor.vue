@@ -24,6 +24,12 @@
                 v-if="!showIconMenu"
             />
             <template v-if="showIconMenu">
+                <quartz-button
+                    class="btn-add-tag left"
+                    @click="onBtnAddTagClick"
+                >
+                    {{ $lang.tr`Add tag` }}
+                </quartz-button>
                 <quartz-input
                     format="text"
                     class="tag-input"
@@ -32,7 +38,7 @@
                     shadow="2-neu-soft-contrast"
                 />
                 <quartz-button
-                    class="btn-add-tag"
+                    class="btn-add-tag right"
                     @click="onBtnAddTagClick"
                 >
                     {{ $lang.tr`Add tag` }}
@@ -40,7 +46,7 @@
             </template>
 
             <div class="icon-menu" v-if="showIconMenu">
-                <div class="menu-bg"></div>
+                <div class="menu-bg" @click="onMenuBgClick"></div>
 
                 <div class="content screen1">
                     <div class="row-selector colors">
@@ -213,6 +219,9 @@ export default {
         onMenuBtnClick() {
             this.showIconMenu = !this.showIconMenu;
         },
+        onMenuBgClick() {
+            this.showIconMenu = false;
+        },
 
         onBtnAddTagClick() {
             const tag = this.tag.trim().toLowerCase();
@@ -336,6 +345,12 @@ export default {
 
         .btn-add-tag {
             border-radius: 50px 0px 0px 50px;
+
+            &.left {
+                display: none;
+                margin: 0 10px;
+                border-radius: 50px;
+            }
         }
 
         .text-editor {
@@ -381,6 +396,31 @@ export default {
                     background-color: var(--quartz-color-4-contrast);
                     box-shadow: var(--quartz-shadow-2-neu-contrast);
                     border-width: 1px;
+                }
+            }
+        }
+    }
+
+    @media screen and (min-width: 610px) {
+        .note-editor {
+            .btn-add-tag {
+                &.left {
+                    display: block;
+                }
+
+                &.right {
+                    display: none;
+                }
+            }
+
+            .icon-menu {
+                .menu-bg {
+                    background: rgba(0, 0, 0, 0.399);
+                }
+
+                .content {
+                    max-width: 500px;
+                    max-height: 700px;
                 }
             }
         }

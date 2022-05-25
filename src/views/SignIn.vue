@@ -1,46 +1,51 @@
 <template>
     <ion-page>
-        <ion-content class="content">
-            <form class="data-form" @submit="onSubmit">
-                <quartz-input
-                    format="login"
-                    :icon="personOutline"
-                    class="input-line"
-                    :placeholder="$lang.tr`Login|field` + ' *'"
-                    v-model="username"
-                />
-                <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
-                    <li class="error" v-for="e in usernameErrors" :key="e">
-                        {{ $lang.tr(e) }}
-                    </li>
-                </ul>
-                <quartz-input
-                    format="password"
-                    :icon="keyOutline"
-                    class="input-line"
-                    :placeholder="$lang.tr`Password` + ' *'"
-                    v-model="password"
-                />
-                
-                <div class="input-line controls">
-                    <quartz-button type="submit" class="submit-button" shadow="center">
-                        {{ $lang.tr`Sign In` }}
-                    </quartz-button>
+        <ion-content>
+            <div class="form-content">
+                <form class="data-form" @submit="onSubmit">
+                    <quartz-input
+                        format="login"
+                        :icon="personOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`Login|field` + ' *'"
+                        v-model="username"
+                    />
+                    <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
+                        <li class="error" v-for="e in usernameErrors" :key="e">
+                            {{ $lang.tr(e) }}
+                        </li>
+                    </ul>
+                    <quartz-input
+                        format="password"
+                        :icon="keyOutline"
+                        class="input-line"
+                        :placeholder="$lang.tr`Password` + ' *'"
+                        v-model="password"
+                    />
+                    
+                    <div class="input-line controls">
+                        <quartz-button type="submit" class="submit-button" shadow="center">
+                            {{ $lang.tr`Sign In` }}
+                        </quartz-button>
+                    </div>
+                </form>
+                <div class="links">
+                    <!-- <router-link class="link" :to="{name: 'reset-password'}">
+                        {{ $lang.tr`Forgot password?` }}
+                    </router-link> -->
+                    <ion-nav-link :router-link="{name: 'reset-password'}" class="link">
+                        {{ $lang.tr`Forgot password?` }}
+                    </ion-nav-link>
                 </div>
-            </form>
-            <div class="links">
-                <router-link class="link" :to="{name: 'reset-password'}">
-                    {{ $lang.tr`Forgot password?` }}
-                </router-link>
             </div>
-
+            
             <quartz-connection-banner/>
         </ion-content>
     </ion-page>
 </template>
 
 <script lang="js">
-import { IonPage, RouterLink } from '@ionic/vue';
+import { IonPage, IonNavLink, IonContent } from '@ionic/vue';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
 import { keyOutline, personOutline } from 'ionicons/icons';
@@ -50,9 +55,11 @@ export default {
     name: 'SignIn',
     components: {
         IonPage,
+        IonContent,
         QuartzInput,
         QuartzButton,
-        RouterLink,
+        // RouterLink,
+        IonNavLink,
         QuartzConnectionBanner
     },
     data() {
@@ -105,48 +112,5 @@ export default {
 </script>
 
 <style scoped lang="scss">
-    .data-form {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-top: 40px;
-    }
-
-    .input-line {
-        margin: 14px 0px;
-        width: calc(100% - 40px);
-        
-        &.controls {
-            text-align: right;
-            margin-top: 40px;
-
-            .submit-button {
-                width: 100%;
-            }
-        }
-
-        &.errors {
-            margin-top: 0px;
-            font-size: 13px;
-            background: linear-gradient(to right, rgba(var(--ion-color-danger-rgb), 0.4), transparent);
-            border-radius: 10px;
-            padding: 2px 10px 5px 20px;
-
-            .error {
-                color: rgba(var(--quartz-text-color-rgb), 0.8);
-            }
-        }
-    }
-
-    .links {
-        max-width: 100%;
-        text-align: right;
-        margin: 20px;
-        font-size: 15px;
-        
-        .link {
-            color: rgba(var(--quartz-text-color-rgb), 0.7);
-        }
-    }
-    
+    @use "@/styles/form-page.scss";
 </style>

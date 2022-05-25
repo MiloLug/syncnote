@@ -1,8 +1,8 @@
 import axios from 'axios';
 
 import { UserStorage } from './storage';
-import { BASE_URL } from '../api.settings.js';
-import localization from '../localization';
+import { BASE_URL } from '@/api.settings.js';
+import localization from '@/localization';
 import { handleError } from './utils';
 
 export const AUTH_URL = `${BASE_URL}/user/auth/`;

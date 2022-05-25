@@ -74,7 +74,7 @@ export default {
 
     .notes-list {
         display: inline-flex;
-        justify-content: start;
+        justify-content: flex-start;
         flex-wrap: wrap;
         width: 384px;
     }

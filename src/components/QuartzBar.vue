@@ -105,6 +105,7 @@ export default {
         flex-direction: column;
         bottom: -250px;
         width: 100%;
+        max-width: 500px;
         height: 300px;
         background: var(--quartz-control-panel-color); 
         border-radius: 20px 20px 0px 0px;
@@ -192,5 +193,11 @@ export default {
     }
     .expanded .quartz-bar__sub-nav-tint {
         display: block;
+    }
+
+    @media screen and (min-width: 500px) {
+        .quartz-bar {
+            left: calc(50% - 250px);
+        }
     }
 </style>

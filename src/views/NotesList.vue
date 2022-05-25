@@ -93,14 +93,7 @@ import { IonPage, IonContent, IonFab, IonFabButton, IonIcon } from '@ionic/vue';
 import { add, swapVertical, pricetagOutline } from 'ionicons/icons';
 import QuartzInput from '../components/QuartzInput';
 import QuartzButton from '../components/QuartzButton';
-import {
-    sortUpdatedAtAsc,
-    sortUpdatedAtDesc,
-    sortTitleAsc,
-    sortTitleDesc,
-    createTitleFilter,
-    createTagsFilter
-} from '../store/note';
+import { sort, filter } from '@/store/utils';
 
 import NoteCard from '../components/NoteCard';
 
@@ -140,13 +133,13 @@ export default {
 
     watch: {
         searchString(value) {
-            this.filters.search = value ? createTitleFilter(value) : null;
+            this.filters.search = value ? filter.createTitleFilter(value) : null;
             this.updateFiltering();
         },
         tagsSelected(value) {
             const tags = Object.getOwnPropertyNames(value);
 
-            this.filters.tags = tags.length ? createTagsFilter(tags) : null;
+            this.filters.tags = tags.length ? filter.createTagsFilter(tags) : null;
             this.updateFiltering();
         },
         storeTags() {
@@ -169,10 +162,10 @@ export default {
             showOrderingMenu: false,
             showTagsMenu: false,
             orderings: [
-                {name: 'Updated at asc|ordering', fn: sortUpdatedAtAsc},
-                {name: 'Updated at desc|ordering', fn: sortUpdatedAtDesc},
-                {name: 'Title asc|ordering', fn: sortTitleAsc},
-                {name: 'Title desc|ordering', fn: sortTitleDesc}
+                {name: 'Updated at asc|ordering', fn: sort.updatedAtAsc},
+                {name: 'Updated at desc|ordering', fn: sort.updatedAtDesc},
+                {name: 'Title asc|ordering', fn: sort.titleAsc},
+                {name: 'Title desc|ordering', fn: sort.titleDesc}
             ],
 
             filters: {
@@ -331,7 +324,7 @@ export default {
 
     .notes-list {
         display: inline-flex;
-        justify-content: start;
+        justify-content: flex-start;
         flex-wrap: wrap;
         width: 384px;
     }
@@ -355,6 +348,21 @@ export default {
     @media screen and (max-width: 383px) {
         .notes-list {
             width: 100%;
+        }
+    }
+
+    @media screen and (min-width: 600px) {
+        .menu {
+            .bg {
+                background: rgba(0, 0, 0, 0.399);
+            }
+
+            .content {
+                max-width: 500px;
+                left: unset;
+                right: 10px;
+                top: 70px;
+            }
         }
     }
 
