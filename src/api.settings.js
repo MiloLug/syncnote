@@ -1,1 +1,1 @@
-export const BASE_URL = 'https://syncnote.spwn.it/{{lang}}/api';
+export const BASE_URL = 'http://127.0.0.1:8000/{{lang}}/api';

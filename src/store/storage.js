@@ -18,4 +18,8 @@ async function getStorage(dbName) {
 }
 
 export const NoteStorage = getStorage('__Note');
+export const DeletionStorage = getStorage('__Deletion');
+
 export const UserStorage = getStorage('__User');
+
+export const CommonStorage = getStorage('__Common');

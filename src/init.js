@@ -25,10 +25,10 @@ export default async function init() {
     });
 
     // init the stuff
-    await store.dispatch('note/sync');
+    await store.dispatch('note/init');
     await store.dispatch('user/init');
     
     localization.state.setLang(store.state.user.lang);
 
-    await store.dispatch('note/sync', store.state.user.isAuthenticated);
+    await store.dispatch('note/sync', store.state.user.isAuthenticated && store.state.hasConnection);
 }

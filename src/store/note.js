@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { NoteStorage } from './storage';
+import { NoteStorage, CommonStorage, DeletionStorage } from './storage';
 
 import { BASE_URL } from '../api.settings.js';
 import localization from '@/localization';
@@ -10,8 +10,8 @@ export const COLLECT_START = 1;
 export const COLLECT_END = 2;
 
 export const NOTES_GENERAL_URL = `${BASE_URL}/notes`;
-export const GET_UPDATES_URL = `${NOTES_GENERAL_URL}/get-updates/`;
-export const SEND_UPDATES_URL = `${NOTES_GENERAL_URL}/send-updates/`;
+export const EXCHANGE_ACTIONS_URL = `${NOTES_GENERAL_URL}/exchange-actions/`;
+export const APPLY_UPDATES_URL = `${NOTES_GENERAL_URL}/apply-updates/`;
 
 
 
@@ -55,6 +55,8 @@ export default {
     state: () => ({
         initialized: new Promise((res) => (finishInitialization = res)),
 
+        lastServerUpdateTime: null,  // time
+
         notes: {},  // {id: Note}
         orderedNotes: [],  // [note id]
         filteredNotes: [],  // [note id]
@@ -62,7 +64,9 @@ export default {
         dataSize: 0,
         dataSizeLimit: -1,  // -1 = no restrictions
         oversizedNotesSize: 0,  // need it to get remaining space since I don't store the notes partilly
-
+        
+        remoteDeletions: {},  // {note id: time}
+        
         notesToSave: {},  // {note id: bool}, notes to save locally
         notesToSend: {},  // {note id: bool}, notes to upload to the server
 
@@ -82,6 +86,13 @@ export default {
         },
         collectEnd(state) {
             state.status = COLLECT_END;
+        },
+
+        updateLastServerUpdateTime(state) {
+            state.lastServerUpdateTime = Date.now();
+        },
+        setLastServerUpdateTime(state, time) {
+            state.lastServerUpdateTime = time;
         },
 
         newOrdering(state, orderingFunction=sortUpdatedAtDesc) {
@@ -254,9 +265,23 @@ export default {
 
             const remoteId = state.localRemoteIds[noteId];
             if (remoteId) {
+                state.remoteDeletions[remoteId] = Date.now();
                 delete state.localRemoteIds[noteId];
                 delete state.remoteLocalIds[remoteId];
             }
+            else
+                state.remoteDeletions[noteId] = Date.now();
+        },
+
+        setRemoteDeletions(state, remoteDeletions) {
+            state.remoteDeletions = {...remoteDeletions};
+        },
+        addRemoteDeletions(state, remoteDeletions) {
+            state.remoteDeletions = {...state.remoteDeletions, ...remoteDeletions};
+        },
+        cleanRemoteDeletions(state, id=null) {
+            if (id) delete state.remoteDeletions[id];
+            else state.remoteDeletions = {};
         },
 
         cleanSavingQueue(state, id=null) {
@@ -316,31 +341,100 @@ export default {
         }
     },
     actions: {
-        async collectNotes({ state, commit, dispatch }, useServer=false) {
+        async init({ state, commit, dispatch }, useServer=false) {
             const noteStorage = await NoteStorage;
-            // TODO: remove this
-            window.noteStorage = noteStorage;
-
-            const tmpList = {};
-            const notesToSave = [];
-            await noteStorage.forEach((value, key) => {
-                tmpList[key] = value;
+            const commonStorage = await CommonStorage;
+            const deletionStorage = await DeletionStorage;
+            
+            const tmpDeletions = {};
+            await deletionStorage.forEach((value, key) => {
+                tmpDeletions[key] = value;
             });
 
-            if (useServer && state.status !== COLLECT_START) {
-                commit('collectStart');
+            const tmpNotesList = {};
+            await noteStorage.forEach((value, key) => {
+                tmpNotesList[key] = value;
+            });
 
-                const data = Object.values(tmpList).map(
-                    note => ({id: note.id, updated_at: new Date(note.updatedAt).toJSON()})
-                );
+            const lastServerUpdateTime =await commonStorage.get('lastServerUpdateTime') ?? Date.now();
+
+            const notesToSend = lastServerUpdateTime
+                ? Object.entries(tmpNotesList)
+                    .filter(
+                        ([_, {updatedAt}]) => updatedAt > lastServerUpdateTime
+                    ).map(
+                        ([note_id, _]) => note_id
+                    )
+                : Object.keys(tmpNotesList)
+
+            commit('setLastServerUpdateTime', lastServerUpdateTime);
+            commit('setRemoteDeletions', tmpDeletions);
+            commit('newNotes', tmpNotesList);
+            commit('notesOrderingUpdate');
+            commit('tagsUpdate');
+            commit('addNotesToSend', notesToSend);
+
+            await dispatch('sync', useServer);
+
+            finishInitialization();useServer
+        },
+
+        async sync({ state, commit, dispatch }, useServer=false) {
+            if (state.status === COLLECT_START) return;
+            commit('collectStart');
+
+            const deletionStorage = await DeletionStorage;
+            const commonStorage = await CommonStorage;
+
+            await dispatch('saveLocalNotes');
+
+            // Save deletions (just in case)
+            await Promise.all(Object.entries(state.remoteDeletions).map(
+                async ([id, time]) => {
+                    await deletionStorage.set(id, time);
+                }
+            ));
+
+            if (useServer) {
+                let requestData, res;
+                
+                // Send exchange request
+                requestData = {
+                    last_update_time: state.lastServerUpdateTime ? new Date(state.lastServerUpdateTime).toJSON() : null,
+                    
+                    updates: Object.keys(state.notesToSend).map(
+                        noteId => ({
+                            note_id: state.localRemoteIds[noteId] ?? noteId,
+                            time: new Date(state.notes[noteId].updatedAt).toJSON()
+                        })
+                    ),
+                    
+                    deletions: Object.entries(state.remoteDeletions).map(
+                        ([noteId, time]) => ({
+                            note_id: noteId,
+                            time: new Date(time).toJSON(),
+                        })
+                    ),
+                };
+                commit('cleanRemoteDeletions');
+                commit('cleanSendingQueue');
+
                 try {
-                    const res = await axios.post(GET_UPDATES_URL, data);
-                    commit('addNotesToSend', res.data?.notes_to_send ?? []);
+                    res = await axios.post(EXCHANGE_ACTIONS_URL, requestData);
+                    const {
+                        update_on_client: updateOnClient,
+                        update_requested: updateRequested,
+                        deletions
+                    } = res.data;
 
-                    for (const note of res.data?.notes_updated ?? []) {
+                    // Transform updates from server
+                    const tmpNotesList = new Array(updateOnClient.length);
+                    const notesToSave = new Array(updateOnClient.length);
+                    for (let i = 0, len = updateOnClient.length; i < len; i++) {
+                        const note = updateOnClient[i];
                         const id = state.remoteLocalIds[note.id] ?? note.id;
 
-                        tmpList[id] = {
+                        tmpNotesList[i] = {
                             id: id,
                             tags: note.tags ?? [],
                             title: note.title ?? "",
@@ -350,23 +444,76 @@ export default {
                             dataSize: note.data_size ?? (note.content ?? "").length,
                             updatedAt: new Date(note.updated_at).getTime()
                         };
-                        notesToSave.push(note.id);
+                        notesToSave[i] = note.id;
                     }
+
+                    // Send updates to server and receive client-server id pairs
+                    requestData = new Array(updateRequested.length);
+                    for (let i = 0, len = updateRequested.length; i < len; i++) {
+                        const serverId = updateRequested[i];
+                        const clientId = state.remoteLocalIds[serverId] ?? serverId;
+                        const note = state.notes[clientId];
+
+                        requestData[i] = {
+                            server_id: serverId,
+                            ...note,
+                            tags: [...note.tags],
+                            updated_at: new Date(note.updatedAt).toJSON()
+                        };
+                    }
+
+                    try {
+                        res = await axios.post(APPLY_UPDATES_URL, requestData);
+                        for (let i = 0, len = res.data.length; i < len; i++) {
+                            const {
+                                client_note_id: clientId,
+                                server_note_id: serverId,
+                            } = res.data[i];
+
+                            commit('addIdPair', {local: clientId, remote: serverId});
+                        }
+
+                        const updateTime = Date.now();
+                        commit('setLastServerUpdateTime', updateTime);
+                        await commonStorage.set('lastServerUpdateTime', updateTime);
+                    }
+                    catch(e) {
+                        dispatch('placeNotification', {
+                            text: localization.state.tr`Send-updates error`,
+                            type: "danger"
+                        }, {root: true});
+
+                        // add notes back, so the algorhytm will try to send them again
+                        // can use map here since it's not usual case
+                        commit('addNotesToSend', updateRequested.map(
+                            noteId => state.remoteLocalIds[noteId] ?? noteId
+                        ));
+                    }
+
+                    // Apply updates from server
+                    // TODO: add 'commitNotesBulk'
+                    for (let i = 0, len = tmpNotesList.length; i < len; i++)
+                        dispatch('commitNote', tmpNotesList[i]);
+
+                    // Apply deletions from server
+                    for (let i = 0, len = deletions.length; i < len; i++) {
+                        const deletion = deletions[i];
+                        const noteId = state.remoteLocalIds[deletion.note_id] ?? deletion.note_id;
+                        commit('deleteNote', noteId);
+                    }
+
+                    await deletionStorage.clear();
+            
+
                 }
                 catch(e) {
                     handleError(dispatch, e, 4000, true);
                 }
-                finally {
-                    commit('collectEnd');
-                }
             }
 
-            commit('newNotes', tmpList);
-            commit('addNotesToSave', notesToSave);
-            commit('notesOrderingUpdate');
-            commit('tagsUpdate');
-            
-            finishInitialization();
+            await dispatch('saveLocalNotes');
+
+            commit('collectEnd');
         },
 
         async saveLocalNotes({ state, commit }) {
@@ -380,71 +527,24 @@ export default {
                 async id => {
                     // if there is a new id (after uploading to the server),
                     // I'll use it to update the note in the store
-                    const realId = state.localRemoteIds[id] ?? id;
-                    if (realId !== id)
+                    const remoteId = state.localRemoteIds[id] ?? id;
+                    if (remoteId !== id)
                         await noteStorage.remove(id);
 
-                    await noteStorage.set(realId, {
+                    await noteStorage.set(remoteId, {
                         ...state.notes[id],
-                        id: realId,
+                        id: remoteId,
                         tags: [...state.notes[id].tags]
                     });
                 }
             ));
         },
-
-        async saveRemoteNotes({ state, commit, dispatch, rootState }) {
-            if (!rootState.hasConnection)
-                return;
-
-            const toSave = Object.keys(state.notesToSend).filter(id => !state.oversizedNotes[id]);
-            commit('cleanSendingQueue');
-
-            if (!toSave.length) return;
-
-            const data = toSave.map(
-                id => ({
-                    local_id: state.localRemoteIds[id] ?? id,
-                    ...state.notes[id],
-                    tags: [...state.notes[id].tags],
-                    updated_at: new Date(state.notes[id].updatedAt).toJSON()
-                })
-            );
-
-            try {
-                const res = await axios.post(SEND_UPDATES_URL, data);
-                for (const localRemote of res.data ?? []) {
-                    commit('addIdPair', {
-                        local: localRemote.local_id,
-                        remote: localRemote.remote_id
-                    });
-                }
-
-                return res;
-            }
-            catch(e) {
-                dispatch('placeNotification', {
-                    text: localization.state.tr`Send-updates error`,
-                    type: "danger"
-                }, {root: true});
-
-                commit('addNotesToSend', toSave);
-            }
-        },
-
-        async sync({ dispatch }, useServer=false) {
-            await dispatch('collectNotes', useServer);
-            if (useServer) {
-                await dispatch('saveRemoteNotes');
-            }
-            await dispatch('saveLocalNotes');
-        },
-
-        async applyIdPairs({ dispatch, commit }) {
+        
+        async applyIdPairs({ dispatch, commit, rootState }) {
             commit('cleanSendingQueue');
             await dispatch('saveLocalNotes');
             commit('cleanIdPairs');
-            await dispatch('collectNotes');
+            await dispatch('init', rootState.user.isAuthenticated && rootState.hasConnection);
         },
 
         async addNote({ commit }, note) {
@@ -500,14 +600,6 @@ export default {
             updateTags && commit('tagsUpdate');
         },
         async deleteNote({ state, commit, dispatch, rootState }, noteId) {
-            if (!rootState.hasConnection && rootState.user.isAuthenticated) {
-                dispatch('placeNotification', {
-                    text: localization.state.tr`Can't delete note with no connection`,
-                    type: "danger"
-                }, {root: true});
-                return;
-            }
-
             const noteStorage = await NoteStorage;
             const remoteId = state.localRemoteIds[noteId] ?? noteId;
 
@@ -515,14 +607,6 @@ export default {
             await Promise.all([noteStorage.remove(noteId), noteStorage.remove(remoteId)]);
             commit('notesOrderingUpdate');
             commit('tagsUpdate');
-
-            if (rootState.user.isAuthenticated)
-                try {
-                    await axios.delete(`${NOTES_GENERAL_URL}/${remoteId}`);
-                }
-                catch(e) {
-                    handleError(dispatch, e, 2000, true, {404: true});
-                }
         },
         async cloneNote({ state, dispatch }, noteId) {
             const note = state.notes[noteId];
