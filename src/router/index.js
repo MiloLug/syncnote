@@ -74,6 +74,7 @@ router.beforeEach(async (to, from, next) => {
         // this was the only way to update it normally
         case 'note-create':
             to.params.createId = generateNoteId();
+            console.log(33333, to.params.createId);
             store.commit('setEditing');
             next();
             break;

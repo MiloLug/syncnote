@@ -307,7 +307,9 @@ export default {
         }
     },
     actions: {
-        async init({ commit, dispatch }, useServer=false) {
+        async init({ commit, dispatch, state }, useServer=false) {
+            window.notes = state;
+            window.calculateNoteSize = calculateNoteSize;
             const noteStorage = await NoteStorage;
             const commonStorage = await CommonStorage;
             const deletionStorage = await DeletionStorage;
@@ -322,7 +324,7 @@ export default {
                 tmpNotesList[key] = value;
             });
 
-            const lastServerUpdateTime =await commonStorage.get('lastServerUpdateTime') ?? Date.now();
+            const lastServerUpdateTime = await commonStorage.get('lastServerUpdateTime') ?? null;
 
             const notesToSend = lastServerUpdateTime
                 ? Object.entries(tmpNotesList)
@@ -513,11 +515,13 @@ export default {
          */
         async localizeNotes({ state, commit, dispatch }) {
             const noteStorage = await NoteStorage;
+            const commonStorage = await CommonStorage;
 
             commit('cleanSendingQueue');
             commit('cleanSavingQueue');
             commit('cleanIdPairs');
 
+            await noteStorage.clear();
             await Promise.all(Object.entries(state.notes).map(
                 async ([, note]) => {
                     const id = generateNoteId();
@@ -528,6 +532,7 @@ export default {
                     });
                 }
             ));
+            await commonStorage.set('lastServerUpdateTime', null);
 
             dispatch('init');
         },

@@ -6,7 +6,9 @@
             class="content"
             @click="onCardClick"
         >
-            <div class="info">{{ new Date(noteData?.updatedAt).toLocaleDateString($lang.tr`__lang_code__`) }}</div>
+            <div class="info">
+                {{ $lang.date(new Date(noteData?.updatedAt)) }}
+            </div>
             <div class="title">
                 <quartz-icon-block :icon="icon">{{ noteData?.title }}</quartz-icon-block>
             </div>
@@ -59,7 +61,9 @@ export default {
             cssVars: {
                 '--note-color': this.noteData?.color || 'var(--default-note-color)'
             },
-            icon: icons[this.noteData?.icon] ?? null
+            icon: icons[this.noteData?.icon] ?? null,
+
+            console
         };
     },
     methods: {

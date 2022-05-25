@@ -7,7 +7,7 @@ const state = reactive({
 
     dictionary: {},
 
-    setLang(langCode){
+    setLang(langCode) {
         langCode = (langCode ?? navigator.language).toLowerCase().split('-');
         this.base = langCode[0] ?? '*';
         this.country = langCode[1] ?? '*';
@@ -17,9 +17,16 @@ const state = reactive({
             : dictionaries['*'];
     },
 
-    tr(key){
+    tr(key) {
         key = Array.isArray(key) ? key[0] : key;
         return this.dictionary[key] ?? key;
+    },
+
+    date(date) {
+        const langCode = this.dictionary['__lang_code__'];
+        if (langCode)
+            return date.toLocaleDateString(langCode);
+        return '';
     }
 });
 
