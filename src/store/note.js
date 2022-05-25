@@ -3,7 +3,7 @@ import { NoteStorage, CommonStorage, DeletionStorage } from './storage';
 
 import { BASE_URL } from '@/api.settings.js';
 import localization from '@/localization';
-import { handleError, calculateNoteSize, filter, sort } from './utils';
+import { handleError, calculateNoteSize, sort, generateNoteId } from './utils';
 
 
 export const COLLECT_START = 1;
@@ -307,7 +307,7 @@ export default {
         }
     },
     actions: {
-        async init({ state, commit, dispatch }, useServer=false) {
+        async init({ commit, dispatch }, useServer=false) {
             const noteStorage = await NoteStorage;
             const commonStorage = await CommonStorage;
             const deletionStorage = await DeletionStorage;
@@ -327,9 +327,9 @@ export default {
             const notesToSend = lastServerUpdateTime
                 ? Object.entries(tmpNotesList)
                     .filter(
-                        ([_, {updatedAt}]) => updatedAt > lastServerUpdateTime
+                        ([, {updatedAt}]) => updatedAt > lastServerUpdateTime
                     ).map(
-                        ([note_id, _]) => note_id
+                        ([note_id, ]) => note_id
                     )
                 : Object.keys(tmpNotesList)
 
@@ -407,7 +407,7 @@ export default {
                             content: note.content ?? "",
                             color: note.color ?? null,
                             icon: note.icon ?? null,
-                            dataSize: note.data_size ?? (note.content ?? "").length,
+                            dataSize: note.data_size ?? calculateNoteSize(note),
                             updatedAt: new Date(note.updated_at).getTime()
                         };
                         notesToSave[i] = note.id;
@@ -505,12 +505,31 @@ export default {
                 }
             ));
         },
-        
-        async applyIdPairs({ dispatch, commit, rootState }) {
+
+        /**
+         * 'localization' here is changing all the ids to local (client) ids
+         * not safe if:
+         *   a note is currently being edited
+         */
+        async localizeNotes({ state, commit, dispatch }) {
+            const noteStorage = await NoteStorage;
+
             commit('cleanSendingQueue');
-            await dispatch('saveLocalNotes');
+            commit('cleanSavingQueue');
             commit('cleanIdPairs');
-            await dispatch('init', rootState.user.isAuthenticated && rootState.hasConnection);
+
+            await Promise.all(Object.entries(state.notes).map(
+                async ([, note]) => {
+                    const id = generateNoteId();
+                    await noteStorage.set(id, {
+                        ...note,
+                        id,
+                        tags: [...note.tags]
+                    });
+                }
+            ));
+
+            dispatch('init');
         },
 
         async addNote({ commit }, note) {
@@ -518,7 +537,7 @@ export default {
                 ...note,
                 tags: [...(note.tags ?? [])],
                 updatedAt: Date.now(),
-                dataSize: note.content.length
+                dataSize: calculateNoteSize(note)
             };
             commit('newNote', note);
             commit('notesOrderingUpdate');
@@ -557,15 +576,17 @@ export default {
                 ...note,
                 updatedAt: Date.now()
             };
-            if (note.content !== undefined)
-                update.dataSize = note.content.length;
+
+            const newSize = calculateNoteSize({...oldNote, ...update});
+            if (oldNote.dataSize !== newSize)
+                update.dataSize = newSize;
             
             commit('noteUpdate', update);
 
             updateOrdering && commit('notesOrderingUpdate');
             updateTags && commit('tagsUpdate');
         },
-        async deleteNote({ state, commit, dispatch, rootState }, noteId) {
+        async deleteNote({ state, commit }, noteId) {
             const noteStorage = await NoteStorage;
             const remoteId = state.localRemoteIds[noteId] ?? noteId;
 
@@ -578,8 +599,8 @@ export default {
             const note = state.notes[noteId];
             await dispatch('addNote', {
                 ...note,
-                id: Math.random().toString(16).slice(2),
-                title: (note.title ?? '') + '++'
+                id: generateNoteId(),
+                title: (note.title ?? '') + ' +'
             });
         },
 

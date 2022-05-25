@@ -38,7 +38,7 @@
                     </ion-nav-link>
                 </div>
             </div>
-            
+
             <quartz-connection-banner/>
         </ion-content>
     </ion-page>
@@ -87,7 +87,7 @@ export default {
         async signIn() {
             this.cleanErrors();
 
-            await this.$store.dispatch("note/applyIdPairs");
+            await this.$store.dispatch('note/localizeNotes');
 
             try{
                 await this.$store.dispatch('user/startAuth', {
@@ -95,10 +95,10 @@ export default {
                     password: this.password
                 });
                 
-                await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+                await this.$store.dispatch('note/init', this.$store.state.user.isAuthenticated);
 
-                this.username = "";
-                this.password = "";
+                this.username = '';
+                this.password = '';
 
                 this.$router.push('/');
             }

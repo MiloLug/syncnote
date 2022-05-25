@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router';
-import store from '../store';
+import store from '@/store';
+import { generateNoteId } from '@/store/utils';
 
 
 const routes = [
@@ -72,7 +73,7 @@ router.beforeEach(async (to, from, next) => {
             break;
         // this was the only way to update it normally
         case 'note-create':
-            to.params.createId = Math.random().toString(16).slice(2);
+            to.params.createId = generateNoteId();
             store.commit('setEditing');
             next();
             break;

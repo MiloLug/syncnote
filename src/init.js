@@ -12,8 +12,9 @@ export default async function init() {
                 type: "danger"
             })
             router.push('/');
-            await store.dispatch('note/applyIdPairs');
+            await store.dispatch('note/sync');
             await store.dispatch('user/logout');
+            await store.dispatch('note/localizeNotes');
         }
         throw err;
     });

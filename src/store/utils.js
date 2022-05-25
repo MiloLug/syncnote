@@ -31,7 +31,14 @@ export async function handleError(dispatch, e, timeShow, noThrow=false, ignore={
 
 
 export function calculateNoteSize(note) {
-    return note.content.legnth + note.title.length + note.tags.length;
+    return (note?.content ?? '').legnth
+        + (note?.title ?? '').length
+        + (note?.tags ?? []).length;
+}
+
+
+export function generateNoteId(note) {
+    '@' + Math.random().toString(16).slice(2) + Math.random().toString(16).slice(2);
 }
 
 

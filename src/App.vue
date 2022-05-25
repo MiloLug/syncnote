@@ -105,8 +105,9 @@ export default {
         onBarSignIn() { this.$router.push({name: "sign-in"}); },
         async onBarLogOut() { 
             this.$router.push('/');
-            await this.$store.dispatch('note/applyIdPairs');
+            await this.$store.dispatch('note/sync');
             await this.$store.dispatch('user/logout');
+            await this.$store.dispatch('note/localizeNotes');
         },
         onBarHome() { this.$router.push("/"); },
         onBarSettings() { this.$router.push({name: "settings"}) }

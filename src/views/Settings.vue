@@ -218,8 +218,9 @@ export default {
 
         async onBtnDeleteUserClick() {
             if (prompt(this.$lang.tr`account deleteion confirmation`) === this.$lang.tr`account deleteion confirmation response`) {
-                await this.$store.dispatch('note/applyIdPairs');
+                await this.$store.dispatch('note/sync');
                 await this.$store.dispatch('user/deleteAccount');
+                await this.$store.dispatch('note/localizeNotes');
             }
         }
     },

@@ -102,7 +102,7 @@ export default {
         async signUp() {
             this.cleanErrors();
 
-            await this.$store.dispatch("note/applyIdPairs");
+            await this.$store.dispatch('note/localizeNotes');
 
             try{
                 await this.$store.dispatch('user/startRegister', {
@@ -111,13 +111,13 @@ export default {
                     password: this.password
                 });
 
-                await this.$store.dispatch("note/sync", this.$store.state.user.isAuthenticated);
+                await this.$store.dispatch('note/init', this.$store.state.user.isAuthenticated);
                 
                 this.$router.push('/');
 
-                this.username = "";
-                this.email = "";
-                this.password = "";
+                this.username = '';
+                this.email = '';
+                this.password = '';
             }
             catch(e) {
                 this.hasErrors = !!e;
