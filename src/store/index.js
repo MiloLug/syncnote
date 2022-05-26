@@ -50,4 +50,3 @@ export default store;
 
 Network.onConnect().subscribe(()=>store.commit('connectionChange', true));
 Network.onDisconnect().subscribe(()=>store.commit('connectionChange', false));
-window.Network = Network;
