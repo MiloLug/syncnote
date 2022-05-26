@@ -1,111 +1,113 @@
 <template>
     <ion-page>
         <ion-content class="content">
-            <div class="settings-block">
-                <div class="title">{{ $lang.tr`Theme|settings section` }}</div>
-                <div class="row-selector">
-                    <quartz-button
-                        class="item empty"
-                        quartzActive="false"
-                        @click="onBtnThemeClick('auto')"
-                    ></quartz-button>
-                    <quartz-button
-                        class="item"
-                        quartzActive="false"
-                        @click="onBtnThemeClick('dark')"
-                        style="--item-color: black;"
-                    ></quartz-button>
-                    <quartz-button
-                        class="item"
-                        quartzActive="false"
-                        @click="onBtnThemeClick('light')"
-                        style="--item-color: white;"
-                    ></quartz-button>
+            <div class="settings-content">
+                <div class="settings-block">
+                    <div class="title">{{ $lang.tr`Theme|settings section` }}</div>
+                    <div class="row-selector">
+                        <quartz-button
+                            class="item empty"
+                            quartzActive="false"
+                            @click="onBtnThemeClick('auto')"
+                        ></quartz-button>
+                        <quartz-button
+                            class="item"
+                            quartzActive="false"
+                            @click="onBtnThemeClick('dark')"
+                            style="--item-color: black;"
+                        ></quartz-button>
+                        <quartz-button
+                            class="item"
+                            quartzActive="false"
+                            @click="onBtnThemeClick('light')"
+                            style="--item-color: white;"
+                        ></quartz-button>
+                    </div>
                 </div>
-            </div>
-            <div class="settings-block">
-                <div class="title">{{ $lang.tr`Language|settings section` }}</div>
-                <ion-select class="lang-selector" interface="popover" v-model="lang">
-                    <ion-select-option value="uk">{{ $langDictionaries.uk['*'].__lang_name__ }}</ion-select-option>
-                    <ion-select-option value="en-us">{{ $langDictionaries.en['*'].__lang_name__ }}</ion-select-option>
-                </ion-select>
-            </div>
-            <div class="settings-block" v-if="$store.state.user.isAuthenticated">
-                <div class="title">{{ $lang.tr`Account|settings section` }}</div>
-                <form class="data-form" @submit="onAccountFormSubmit">
-                    <quartz-input
-                        format="login"
-                        :icon="personOutline"
-                        class="input-line"
-                        :placeholder="$lang.tr`Login|field` + ' *'"
-                        v-model="newUsername"
-                    />
-                    <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
-                        <li class="error" v-for="e in usernameErrors" :key="e">
-                            {{ $lang.tr(e) }}
-                        </li>
-                    </ul>
+                <div class="settings-block">
+                    <div class="title">{{ $lang.tr`Language|settings section` }}</div>
+                    <ion-select class="lang-selector" interface="popover" v-model="lang">
+                        <ion-select-option value="uk">{{ $langDictionaries.uk['*'].__lang_name__ }}</ion-select-option>
+                        <ion-select-option value="en-us">{{ $langDictionaries.en['*'].__lang_name__ }}</ion-select-option>
+                    </ion-select>
+                </div>
+                <div class="settings-block" v-if="$store.state.user.isAuthenticated">
+                    <div class="title">{{ $lang.tr`Account|settings section` }}</div>
+                    <form class="data-form" @submit="onAccountFormSubmit">
+                        <quartz-input
+                            format="login"
+                            :icon="personOutline"
+                            class="input-line"
+                            :placeholder="$lang.tr`Login|field` + ' *'"
+                            v-model="newUsername"
+                        />
+                        <ul class="errors input-line" v-if="hasErrors && usernameErrors.length">
+                            <li class="error" v-for="e in usernameErrors" :key="e">
+                                {{ $lang.tr(e) }}
+                            </li>
+                        </ul>
 
-                    <quartz-input
-                        format="email"
-                        :icon="mailOutline"
-                        class="input-line"
-                        :placeholder="$lang.tr`Email`"
-                        v-model="newEmail"
-                    />
-                    <ul class="errors input-line" v-if="hasErrors && emailErrors.length">
-                        <li class="error" v-for="e in emailErrors" :key="e">
-                            {{ $lang.tr(e) }}
-                        </li>
-                    </ul>
+                        <quartz-input
+                            format="email"
+                            :icon="mailOutline"
+                            class="input-line"
+                            :placeholder="$lang.tr`Email`"
+                            v-model="newEmail"
+                        />
+                        <ul class="errors input-line" v-if="hasErrors && emailErrors.length">
+                            <li class="error" v-for="e in emailErrors" :key="e">
+                                {{ $lang.tr(e) }}
+                            </li>
+                        </ul>
 
-                    <quartz-divider/>
-                    <quartz-input
-                        format="password"
-                        :icon="keyOutline"
-                        class="input-line"
-                        :placeholder="$lang.tr`Old password`"
-                        v-model="oldPassword"
-                    />
-                    <ul class="errors input-line" v-if="hasErrors && oldPasswordErrors.length">
-                        <li class="error" v-for="e in oldPasswordErrors" :key="e">
-                            {{ $lang.tr(e) }}
-                        </li>
-                    </ul>
+                        <quartz-divider/>
+                        <quartz-input
+                            format="password"
+                            :icon="keyOutline"
+                            class="input-line"
+                            :placeholder="$lang.tr`Old password`"
+                            v-model="oldPassword"
+                        />
+                        <ul class="errors input-line" v-if="hasErrors && oldPasswordErrors.length">
+                            <li class="error" v-for="e in oldPasswordErrors" :key="e">
+                                {{ $lang.tr(e) }}
+                            </li>
+                        </ul>
 
-                    <quartz-input
-                        format="password"
-                        :icon="keyOutline"
-                        class="input-line"
-                        :placeholder="$lang.tr`New password`"
-                        v-model="newPassword"
-                    />
-                    <ul class="errors input-line" v-if="hasErrors && newPasswordErrors.length">
-                        <li class="error" v-for="e in newPasswordErrors" :key="e">
-                            {{ $lang.tr(e) }}
-                        </li>
-                    </ul>
-                    
+                        <quartz-input
+                            format="password"
+                            :icon="keyOutline"
+                            class="input-line"
+                            :placeholder="$lang.tr`New password`"
+                            v-model="newPassword"
+                        />
+                        <ul class="errors input-line" v-if="hasErrors && newPasswordErrors.length">
+                            <li class="error" v-for="e in newPasswordErrors" :key="e">
+                                {{ $lang.tr(e) }}
+                            </li>
+                        </ul>
+                        
+                        <div class="input-line controls">
+                            <quartz-button type="submit" class="submit-button" shadow="center">
+                                {{ $lang.tr`Save` }}
+                            </quartz-button>
+                        </div>
+                    </form>
+                    <div class="description" v-html="$lang.tr`account settings description`"></div>
+
+                    <quartz-connection-banner/>
+                </div>
+
+                <div class="settings-block" v-if="$store.state.user.isAuthenticated">
+                    <div class="title">{{ $lang.tr`Dangerous|settings section` }}</div>
                     <div class="input-line controls">
-                        <quartz-button type="submit" class="submit-button" shadow="center">
-                            {{ $lang.tr`Save` }}
+                        <quartz-button class="submit-button delete-user" shadow="center" @click="onBtnDeleteUserClick">
+                            {{ $lang.tr`Remove account` }}
                         </quartz-button>
                     </div>
-                </form>
-                <div class="description" v-html="$lang.tr`account settings description`"></div>
 
-                <quartz-connection-banner/>
-            </div>
-
-            <div class="settings-block" v-if="$store.state.user.isAuthenticated">
-                <div class="title">{{ $lang.tr`Dangerous|settings section` }}</div>
-                <div class="input-line controls">
-                    <quartz-button class="submit-button delete-user" shadow="center" @click="onBtnDeleteUserClick">
-                        {{ $lang.tr`Remove account` }}
-                    </quartz-button>
+                    <quartz-connection-banner/>
                 </div>
-
-                <quartz-connection-banner/>
             </div>
         </ion-content>
     </ion-page>
@@ -230,6 +232,15 @@ export default {
 <style lang="scss" scoped>
     @use "@/styles/utils/tools.scss";
 
+    .settings-content {
+        display: flex;
+        align-items: flex-start;
+        flex-wrap: wrap;
+        justify-content: space-evenly;
+        flex-direction: row;
+        align-content: space-between;
+    }
+
     .settings-block {
         background: rgba(var(--quartz-color-4-rgb), 0.5);
         padding: 1.5px 17.5px 8px 17.5px;
@@ -237,6 +248,8 @@ export default {
         margin: 13.5px;
         overflow: hidden;
         position: relative;
+        width: 100%;
+        max-width: 700px;
 
         > .title {
             margin: 10px 0px;
@@ -344,4 +357,45 @@ export default {
         margin: 20px 0px;
     }
 
+
+    @media screen and (min-width: 820px) {
+        .settings-block {
+            max-width: 380px;
+            min-width: 380px;
+
+            &:nth-child(1n) {
+            background: var(--quartz-color-4);
+            }
+            &:nth-child(2n), &:nth-child(3n) {
+                background: rgba(var(--quartz-color-4-rgb), 0.5);
+            }
+            &:nth-child(4n) {
+                background: var(--quartz-color-4);
+            }
+        }
+    }
+    @media screen and (min-width: 1000px) {
+        .settings-block {
+            max-width: 470px;
+            min-width: 400px;
+        }
+    }
+
+    @media screen and (min-width: 1380px) {
+        .settings-block {
+            max-width: 600px;
+        }
+    }
+
+    @media screen and (min-width: 1480px) {
+        .settings-block {
+            min-width: 700px;
+            max-width: 700px;
+            margin: 13.5px calc(10% - 140px) 13.5px calc(40% - 560px);
+            
+            &:nth-child(even) {
+                margin: 13.5px calc(40% - 560px) 13.5px calc(10% - 140px);
+            }
+        }
+    }
 </style>
