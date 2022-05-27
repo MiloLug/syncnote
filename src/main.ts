@@ -31,10 +31,10 @@ import init from './init';
 
 const app = createApp(App)
   .use(store)
+  .use(localization)
   .use(IonicVue)
   .use(router)
-  .use(quartzIonicEvents)
-  .use(localization);
+  .use(quartzIonicEvents);
 
 init();
 

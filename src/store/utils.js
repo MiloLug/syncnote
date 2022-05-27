@@ -30,6 +30,21 @@ export async function handleError(dispatch, e, timeShow, noThrow=false, ignore={
 }
 
 
+export function createAsyncCallback() {
+    let resolve;
+    const promise = new Promise(r => resolve = r);
+    return [resolve, promise];
+}
+
+
+export async function commitWithCallback(commit, mutation, ...args) {
+    const [resolve, promise] = createAsyncCallback();
+    commit(mutation, [resolve, ...args]);
+
+    return promise;
+}
+
+
 export function calculateNoteSize(note) {
     return (note?.content ?? '').length
         + (note?.title ?? '').length

@@ -163,7 +163,6 @@ export default {
             if (data.newPassword)
                 data.new_password = data.newPassword,
                 data.old_password = data.oldPassword;
-                console.log(data, data.newPassword);
             try {
                 await axios.patch(PROFILE_URL, data);
                 await dispatch('getProfile');
@@ -196,7 +195,7 @@ export default {
             ]);
         },
 
-        async loadStorage({ dispatch, commit }) {
+        async loadStorage({ state, dispatch, commit }) {
             const userStorage = await UserStorage;
 
             commit('setAuth', {
@@ -207,7 +206,7 @@ export default {
             commit('setTheme', await userStorage.get('theme'));
             
             await dispatch('setLangLocal', await userStorage.get('lang'));
-            await dispatch('setMaxDataSizeLocal', userStorage.get('maxDataSize') ?? -1);
+            await dispatch('setMaxDataSizeLocal', await userStorage.get('maxDataSize') ?? -1);
 
             commit('setUsedDataSize', await userStorage.get('usedDataSize'));
             commit('setEmail', await userStorage.get('email'));

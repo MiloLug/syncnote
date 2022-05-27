@@ -217,7 +217,7 @@ export default {
             return false;
         },
         onLongTap() {
-            console.log(321213);
+            console.log('Not implemented');
         }
     }
 }

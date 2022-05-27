@@ -3,7 +3,13 @@ import { NoteStorage, CommonStorage, DeletionStorage } from './storage';
 
 import { BASE_URL } from '@/api.settings.js';
 import localization from '@/localization';
-import { handleError, calculateNoteSize, sort, generateNoteId } from './utils';
+import { 
+    handleError,
+    calculateNoteSize,
+    sort,
+    generateNoteId,
+    commitWithCallback
+} from './utils';
 
 
 export const COLLECT_START = 1;
@@ -249,14 +255,48 @@ export default {
             if (id) delete state.remoteDeletions[id];
             else state.remoteDeletions = {};
         },
+        popRemoteDeletions(state, [callback, id=undefined]) {
+            let data;
+            if (id) {
+                data = state.remoteDeletions[id];
+                delete state.remoteDeletions[id];
+            } else {
+                data = state.remoteDeletions;
+                state.remoteDeletions = {};
+            }
+            callback(data);
+        },
 
         cleanSavingQueue(state, id=null) {
             if (id) delete state.notesToSave[id];
             else state.notesToSave = {};
         },
+        popSavingQueue(state, [callback, id=undefined]) {
+            let data;
+            if (id) {
+                data = state.notesToSave[id];
+                delete state.notesToSave[id];
+            } else {
+                data = state.notesToSave;
+                state.notesToSave = {};
+            }
+            callback(data);
+        },
+
         cleanSendingQueue(state, id=null) {
             if (id) delete state.notesToSend[id];
             else state.notesToSend = {};
+        },
+        popSendingQueue(state, [callback, id=undefined]) {
+            let data;
+            if (id) {
+                data = state.notesToSend[id];
+                delete state.notesToSend[id];
+            } else {
+                data = state.notesToSend;
+                state.notesToSend = {};
+            }
+            callback(data);
         },
 
         addNotesToSend(state, ids=[]) {
@@ -308,8 +348,6 @@ export default {
     },
     actions: {
         async init({ commit, dispatch, state }, useServer=false) {
-            window.notes = state;
-            window.calculateNoteSize = calculateNoteSize;
             const noteStorage = await NoteStorage;
             const commonStorage = await CommonStorage;
             const deletionStorage = await DeletionStorage;
@@ -370,22 +408,20 @@ export default {
                 requestData = {
                     last_update_time: state.lastServerUpdateTime ? new Date(state.lastServerUpdateTime).toJSON() : null,
                     
-                    updates: Object.keys(state.notesToSend).map(
+                    updates: Object.keys(await commitWithCallback(commit, 'popSendingQueue')).map(
                         noteId => ({
                             note_id: state.localRemoteIds[noteId] ?? noteId,
                             time: new Date(state.notes[noteId].updatedAt).toJSON()
                         })
                     ),
                     
-                    deletions: Object.entries(state.remoteDeletions).map(
+                    deletions: Object.entries(await commitWithCallback(commit, 'popRemoteDeletions')).map(
                         ([noteId, time]) => ({
                             note_id: noteId,
                             time: new Date(time).toJSON(),
                         })
                     ),
                 };
-                commit('cleanRemoteDeletions');
-                commit('cleanSendingQueue');
 
                 try {
                     res = await axios.post(EXCHANGE_ACTIONS_URL, requestData);
@@ -486,8 +522,7 @@ export default {
 
         async saveLocalNotes({ state, commit }) {
             const noteStorage = await NoteStorage;
-            const toSave = Object.keys(state.notesToSave);
-            commit('cleanSavingQueue');
+            const toSave = Object.keys(await commitWithCallback(commit, 'popSavingQueue'));
 
             if (!toSave.length) return;
 

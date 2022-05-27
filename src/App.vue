@@ -33,6 +33,7 @@
 import { IonApp, IonIcon, IonRouterOutlet } from '@ionic/vue';
 import QuartzBar from './components/QuartzBar';
 import { homeOutline, syncOutline, gridOutline, alertOutline, informationOutline} from 'ionicons/icons';
+import { setStopSyncLoop } from '@/init';
 
 export default {
     name: "App",
@@ -64,7 +65,6 @@ export default {
     },
     data() {
         return {
-            stopLoop: false,
             alertOutline,
             informationOutline
         };
@@ -76,18 +76,6 @@ export default {
         window.addEventListener('beforeunload', this.saveLocalNotes);
         document.addEventListener("pause", this.saveLocalNotes, false);
         document.addEventListener("resign", this.saveLocalNotes, false);
-
-        const loop = async () => {
-            if (this.stopLoop) return;
-            await this.$store.dispatch(
-                'note/sync',
-                this.$store.state.user.isAuthenticated && this.$store.state.hasConnection
-            );
-            setTimeout(loop, 5000);
-        };
-        loop();
-
-        window.gg = this.$store;
     },
     methods: {
         onKeyboardDidShow() {
@@ -119,7 +107,7 @@ export default {
         document.removeEventListener("pause", this.saveLocalNotes);
         document.removeEventListener("resign", this.saveLocalNotes);
 
-        this.stopLoop = true;
+        setStopSyncLoop(true);
     },
 };
 </script>
